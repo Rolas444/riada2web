@@ -1,41 +1,71 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
+# Archivos de registro
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
+pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# Datos de ejecución
+pids
+*.pid
+*.seed
+*.pid.lock
 
-# vercel
-.vercel
+# Directorio de dependencias
+/node_modules
 
-# typescript
+# Archivos de entorno
+# No subas tus variables de entorno a git. Usa .env.example para mostrar qué variables se necesitan.
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Salida de compilación y artefactos
+/dist
+/build
+/.out/
+/.next/
+/.svelte-kit/
+/storybook-static
+
+# Reportes de cobertura de pruebas
+/coverage
+/coverage-summary.json
+.nyc_output
+
+# Archivos de TypeScript
 *.tsbuildinfo
-next-env.d.ts
+
+# Cache de herramientas
+.eslintcache
+.prettier-cache
+
+# Archivos del sistema operativo
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Carpetas de IDEs y editores
+.idea
+.vscode/*
+!/.vscode/settings.json
+!/.vscode/tasks.json
+!/.vscode/launch.json
+!/.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
