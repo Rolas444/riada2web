@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LogOut, PanelLeft, PanelRight } from 'lucide-react';
@@ -30,29 +30,54 @@ export type UserProfile = {
 interface SidebarProps {
   navItems: NavItem[];
   user?: UserProfile;
-  onLogout?: () => void;
-  isCollapsed: boolean;
-  setIsCollapsed: (isCollapsed: boolean) => void;
+  onLogout: () => void;
+  isCollapsed: boolean; // Para el estado en desktop
+  setIsCollapsed: (isCollapsed: boolean) => void; // Para desktop
+  isMobileOpen: boolean; // Para el estado en móvil
+  onCloseMobile: () => void; // Para cerrar en móvil
 }
 
 /**
  * Un componente de barra lateral (sidebar) reutilizable y responsive para un dashboard.
  * Es controlable desde su componente padre a través de las props `isCollapsed` y `setIsCollapsed`.
  */
-export const Sidebar: React.FC<SidebarProps> = ({
-  navItems,
-  user,
-  onLogout,
-  isCollapsed,
-  setIsCollapsed,
+export const Sidebar: React.FC<SidebarProps> = 
+({navItems, user, onLogout, isCollapsed, setIsCollapsed, isMobileOpen, onCloseMobile 
 }) => {
   const pathname = usePathname();
+
+    // Cierra el sidebar móvil al cambiar de ruta
+  useEffect(() => {
+    if (isMobileOpen) {
+      onCloseMobile();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
+  const handleLinkClick = () => {
+    if (isMobileOpen) {
+      onCloseMobile();
+    }
+  };
+
+  const handleLogoutClick = () => {
+    onLogout();
+    if (isMobileOpen) {
+      onCloseMobile();
+    }
+  };
 
   return (
     <aside
       className={clsx(
-        'relative flex h-screen flex-col bg-gray-50 text-gray-800 transition-all duration-300 ease-in-out dark:bg-gray-900 dark:text-gray-200 dark:border-r dark:border-gray-800',
-        { 'w-64': !isCollapsed, 'w-20': isCollapsed },
+        // 'relative flex h-screen flex-col bg-gray-50 text-gray-800 transition-all duration-300 ease-in-out dark:bg-gray-900 dark:text-gray-200 dark:border-r dark:border-gray-800',
+        'fixed inset-y-0 left-0 z-50 flex h-full flex-col bg-gray-50 text-gray-800 transition-transform duration-300 ease-in-out dark:border-r dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 lg:relative lg:translate-x-0',
+        { 
+          'w-64': !isCollapsed, // Ancho normal en desktop
+          'w-20': isCollapsed, // Ancho colapsado en desktop
+          'translate-x-0': isMobileOpen, // Abierto en móvil
+          '-translate-x-full': !isMobileOpen, // Cerrado en móvil
+         },
       )}
       aria-label="Barra lateral principal"
     >
@@ -87,7 +112,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               return (
                 <li key={item.href}>
                   <Link
-                    href={item.href}
+                    href={item.href} onClick={handleLinkClick}
                     className={clsx(
                       'flex items-center rounded-lg p-2 text-base font-normal',
                       'transition-colors hover:bg-gray-200 dark:hover:bg-gray-700',
@@ -131,7 +156,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
           <button
-            onClick={onLogout}
+            // onClick={onLogout}
+            onClick={handleLogoutClick}
             className={clsx(
               'flex w-full items-center rounded-lg p-2 text-base font-normal',
               'transition-colors hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-800/50 dark:hover:text-red-400',

@@ -8,15 +8,21 @@ import {
   LayoutDashboard,
   Settings,
   Users,
-  LineChart,
-  Briefcase,
+  Contact,
+  Group,
 } from 'lucide-react';
-import { useAuthStore } from '@/features/auth/store/authStore';
+import { useAuthStore } from '@/features/auth/store/authStore'; 
+import { Sidebar, NavItem } from '@/components/dashboard/Sidebar';
+import DashboardContent from '@/components/dashboard/DashboardContent';
 
-import {
-  Sidebar,
-  NavItem,
-} from '@/components/dashboard/Sidebar';
+
+const navAdminItems: NavItem[] = [
+  {
+    label: 'Usuarios',
+    href: '/users',
+    icon: <Users />,
+  },
+]
 
 const navItems: NavItem[] = [
   {
@@ -25,23 +31,21 @@ const navItems: NavItem[] = [
     icon: <LayoutDashboard />,
   },
   {
-    label: 'Usuarios',
-    href: '/dashboard/users',
-    icon: <Users />,
+    label: 'Personas',
+    href: '/people',
+    icon: <Contact />,
   },
+  
   {
-    label: 'Proyectos',
-    href: '/dashboard/projects',
-    icon: <Briefcase />,
+    label: 'Miembros',
+    href: '/members',
+    icon: <Group />,
   },
-  {
-    label: 'Analíticas',
-    href: '/dashboard/analytics',
-    icon: <LineChart />,
-  },
+  
+  
   {
     label: 'Configuración',
-    href: '/dashboard/settings',
+    href: '/settings',
     icon: <Settings />,
   },
 ];
@@ -53,7 +57,10 @@ const  DashboardLayout: React.FC<DashboardLayoutProps>=({children})=> {
   const router = useRouter();
   const { isAuthenticated, logout } = useAuth();
   const user = useAuthStore((state) => state.user);
-  const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const isAdmin = user?.role === 'admin'; // Verifica si el usuario es admin
+  const navItemsToUse = isAdmin ? [...navItems, ...navAdminItems] : navItems;
 
   useEffect(() => {
     // isAuthenticated puede ser `undefined` durante el render inicial en el cliente
@@ -72,17 +79,24 @@ const  DashboardLayout: React.FC<DashboardLayoutProps>=({children})=> {
 
   return (
     <ThemeProvider>
-      <div className="flex h-screen bg-gray-100 dark:bg-gray-950">
+      <div className="relative flex h-screen bg-gray-100 dark:bg-gray-950">
+        {/* Fondo oscuro para el menú móvil */}
+        {isMobileSidebarOpen && (
+          <div
+            className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+            onClick={() => setMobileSidebarOpen(false)}
+          ></div>
+        )}
         <Sidebar
-          navItems={navItems}
+          navItems={navItemsToUse}
           user={
             user
               ? {
-                  name: user.name || 'Usuario',
-                  email: user.email || 'mail', // Usamos el username como email
+                  name: user.email || 'Usuario',
+                  email: user.email || '',
                   // Usamos encodeURIComponent para manejar nombres con espacios/caracteres especiales
                   avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                    user.name || 'U' // Fallback a una letra si el nombre es nulo
+                    user.email || 'U' // Fallback a una letra si el nombre es nulo
                   )}&background=0D8ABC&color=fff`,
                 }
               : undefined
@@ -90,8 +104,12 @@ const  DashboardLayout: React.FC<DashboardLayoutProps>=({children})=> {
           onLogout={logout}
           isCollapsed={isSidebarCollapsed}
           setIsCollapsed={setSidebarCollapsed}
+          isMobileOpen={isMobileSidebarOpen}
+          onCloseMobile={() => setMobileSidebarOpen(false)}
         />
-        <main className="flex-1 overflow-y-auto p-4 lg:p-8">{children}</main>
+        <DashboardContent onToggleMobileSidebar={() => setMobileSidebarOpen(true)}>
+          {children}
+        </DashboardContent>
       </div>
     </ThemeProvider>
     
