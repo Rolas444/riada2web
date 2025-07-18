@@ -1,0 +1,32 @@
+/* /app/(dashboard)/dashboard.css */
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 250px 1fr; /* Sidebar takes 250px, main content takes the rest */
+  grid-template-rows: 1fr; /* Single row */
+  height: 100vh; /* Occupy full viewport height */
+}
+
+.sidebar {
+  /* background-color: #f0f0f0 ; */
+  padding: 20px;
+  overflow-y: auto; /* Allow sidebar content to scroll */
+}
+
+.main-content {
+  padding: 20px;
+  overflow-y: auto; /* Allow main content to scroll */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr; /* Stack sidebar and main content vertically */
+    grid-template-rows: auto 1fr; /* Sidebar takes auto height, main content takes the rest */
+  }
+
+  .sidebar {
+    /* Styles to adjust the sidebar for top placement on smaller screens */
+    overflow-y: visible; /* Disable scroll for top sidebar */
+    /* You might need to adjust padding/margins here */
+  }
+}
