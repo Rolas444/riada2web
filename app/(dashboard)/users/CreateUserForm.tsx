@@ -14,7 +14,7 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onFormSubmit }) => {
   // Los hooks se llaman en el nivel superior del componente.
   const token = useAuthStore((state) => state.token);
 
-  const userFormConfig: FieldConfig[] = [
+  const userFormConfig: FieldConfig<NewUserPayload>[] = [
     {
       name: 'username',
       label: 'Nombre de usuario',

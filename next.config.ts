@@ -7,6 +7,16 @@ const nextConfig: NextConfig = {
     // Agrega el origen desde la variable de entorno si existe
     ...(process.env.ALLOWED_DEV_ORIGIN ? [process.env.ALLOWED_DEV_ORIGIN] : []),
   ],
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'ui-avatars.com',
+        port: '',
+        pathname: '/api/**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

@@ -1,18 +1,19 @@
 'use client';
 
 import React from 'react';
-import { useForm, Controller, SubmitHandler, FieldValues, RegisterOptions, Path, DefaultValues, } from 'react-hook-form';
+import { useForm, Controller, SubmitHandler, FieldValues, RegisterOptions, Path, DefaultValues, PathValue } from 'react-hook-form';
 import { Input } from './Input';
 import { Select } from './Select';
+import { Button } from './Button';
 
 // Define la estructura para un único campo de formulario
-export interface FieldConfig {
-  name: string;
+export interface FieldConfig<T extends FieldValues> {
+  name: Path<T>;
   label: string;
   type: 'text' | 'email' | 'password' | 'select';
   placeholder?: string;
-  validation?: RegisterOptions;
-  defaultValue?: string;
+  validation?: RegisterOptions<T, Path<T>>;
+  defaultValue?: PathValue<T, Path<T>>;
   disabled?: boolean;
   options?: { value: string; label: string }[];
 }
@@ -47,10 +48,10 @@ const ReusableForm = <T extends FieldValues>({
             {field.label}
           </label>
           <Controller
-            name={field.name as Path<T>}
+            name={field.name}
             control={control}
             rules={field.validation}
-            defaultValue={field.defaultValue || ''}
+            defaultValue={field.defaultValue ?? ('' as PathValue<T, Path<T>>)}
             render={({ field: controllerField }) => {
               if (field.type === 'select') {
                 return (
@@ -87,12 +88,9 @@ const ReusableForm = <T extends FieldValues>({
           )}
         </div>
       ))}
-      <button
-        type="submit"
-        className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-      >
+      <Button type='submit'>
         {submitButtonText}
-      </button>
+      </Button>
     </form>
   );
 };

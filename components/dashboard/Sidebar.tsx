@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { LogOut, PanelLeft, PanelRight } from 'lucide-react';
 import clsx from 'clsx';
@@ -140,10 +141,12 @@ export const Sidebar: React.FC<SidebarProps> =
         <div className="mt-auto border-t p-2 dark:border-gray-800">
           {user && (
             <div className="mb-2 flex items-center p-2">
-              <img
+              <Image
                 src={user.avatarUrl}
                 alt={`Avatar de ${user.name}`}
-                className="h-8 w-8 rounded-full"
+                className="rounded-full"
+                width={32}
+                height={32}
               />
               {!isCollapsed && (
                 <div className="ml-3 overflow-hidden">
