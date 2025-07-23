@@ -18,8 +18,7 @@ export function useAuth() {
   const handleLogin = async (email: string, password: string, recaptchaToken: string) => {
     try {
       const { token, user } = await loginWithCredentials(email, password, recaptchaToken);
-      console.log(user)
-      console.log(token)
+      
       // Guarda el token y el usuario en el store de autenticación
       login(token, user);
       router.push('/dashboard');

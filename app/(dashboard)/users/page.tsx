@@ -1,17 +1,53 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
-import { Toaster } from 'sonner';
+import { toast, Toaster } from 'sonner';
 import CreateUserForm from './CreateUserForm';
+import { useAuthStore } from '@/features/auth/store/authStore';
+import { User } from '@/features/users/types/userTypes';
+import { getUsers } from '@/features/users/api/usersApi';
+import UsersTable from './UsersTable';
 
 export default function UsersPage() {
   const [isModalOpen, setModalOpen] = useState(false);
 
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const token = useAuthStore(state => state.token);
+
+  const fetchUsers = useCallback(async () => {
+    if (!token) {
+      setError('No estás autenticado.');
+      setLoading(false);
+      return;
+    }
+    try {
+      setLoading(true);
+      setError(null);
+      const fetchedUsers = await getUsers(token);
+      setUsers(fetchedUsers);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Ocurrió un error desconocido.';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
   const handleUserCreated = () => {
     setModalOpen(false);
-    // Aquí podrías añadir lógica para refrescar la lista de usuarios
+    // Refrescar la lista de usuarios después de una creación exitosa.
+    // La notificación de éxito ya la maneja el formulario.
+    fetchUsers();
   };
 
   return (
@@ -27,6 +63,12 @@ export default function UsersPage() {
           </p>
         </div>
         <Button onClick={() => setModalOpen(true)}>Crear Usuario</Button>
+      </div>
+
+       <div className="mt-8">
+        {loading && <p className="text-center">Cargando usuarios...</p>}
+        {error && <p className="text-center text-red-500">Error: {error}</p>}
+        {!loading && !error && <UsersTable users={users} />}
       </div>
 
       <Modal

@@ -1,4 +1,15 @@
 /**
+ * Define la estructura de un objeto de usuario.
+ */
+export interface User {
+  id: string;
+  username: string;
+  role: 'admin' | 'user';
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
  * Define la estructura de datos para crear un nuevo usuario.
  */
 export interface NewUserPayload {

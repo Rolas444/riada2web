@@ -3,9 +3,15 @@
 import React from 'react';
 import { useThemeStore } from '@/features/theme/store/themeStore';
 import Tabs, { Tab } from '@/components/ui/Tabs';
+import { useTheme } from 'next-themes';
 
 const AppearanceSettings = () => {
   const { toggleTheme, theme } = useThemeStore();
+  const {setTheme} = useTheme();
+  const handleThemeChange = () => {
+    toggleTheme();
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
   return (
     <div className="rounded-lg border bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
       <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
@@ -19,7 +25,7 @@ const AppearanceSettings = () => {
           </p>
         </div>
         <button
-          onClick={toggleTheme}
+          onClick={handleThemeChange}
           className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           Cambiar Tema
