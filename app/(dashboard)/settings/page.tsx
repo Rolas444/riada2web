@@ -13,7 +13,7 @@ const AppearanceSettings = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
   };
   return (
-    <div className="rounded-lg border bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div className="rounded-lg border-0 dark:border bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
       <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
         Apariencia
       </h2>

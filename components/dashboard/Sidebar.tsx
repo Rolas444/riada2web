@@ -101,8 +101,8 @@ export const Sidebar: React.FC<SidebarProps> =
             'justify-start': !isCollapsed,
           })}
         >
-          <span className="text-xl font-bold text-blue-600">R</span>
-          {!isCollapsed && <span className="ml-2 text-lg font-bold">Riada</span>}
+          {isCollapsed && <span className="text-xl font-bold text-blue-600 dark:text-blue-300">R</span>}
+          {!isCollapsed && <span className="ml-2 text-lg font-bold text-blue-600 dark:text-blue-300">Riada</span>}
         </div>
 
         {/* Navegación Principal */}
@@ -118,7 +118,7 @@ export const Sidebar: React.FC<SidebarProps> =
                       'flex items-center rounded-lg p-2 text-base font-normal',
                       'transition-colors hover:bg-gray-200 dark:hover:bg-gray-700',
                       {
-                        'bg-blue-100 text-blue-600 dark:bg-gray-700': isActive,
+                        'bg-blue-100 text-blue-600 dark:text-blue-300 dark:bg-gray-700': isActive,
                         'justify-center': isCollapsed,
                       },
                     )}
@@ -126,7 +126,7 @@ export const Sidebar: React.FC<SidebarProps> =
                   >
                     {React.cloneElement(item.icon, {
                       className: clsx('h-6 w-6', {
-                        'text-blue-600': isActive,
+                        'text-blue-600 dark:text-blue-300': isActive,
                       }),
                     })}
                     {!isCollapsed && <span className="ml-3">{item.label}</span>}
