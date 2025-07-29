@@ -18,4 +18,5 @@ export interface PersonRequest {
   docNumber?: string;
   typeDoc?: DocType;
   photo?: string;
+  email: string;
 }

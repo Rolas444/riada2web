@@ -10,7 +10,7 @@ import { Button } from './Button';
 export interface FieldConfig<T extends FieldValues> {
   name: Path<T>;
   label: string;
-  type: 'text' | 'email' | 'password' | 'select';
+  type: 'text' | 'email' | 'password' | 'select' | 'date';
   placeholder?: string;
   validation?: RegisterOptions<T, Path<T>>;
   defaultValue?: PathValue<T, Path<T>>;

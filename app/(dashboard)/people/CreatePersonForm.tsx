@@ -49,15 +49,9 @@ export const CreatePersonForm: React.FC<CreatePersonFormProps> = ({ onFormSubmit
     {
       name: 'birthday',
       label: 'Fecha de Nacimiento',
-      type: 'text', // ReusableForm no tiene 'date', usamos 'text' con placeholder
-      placeholder: 'YYYY-MM-DD',
-      validation: {
-        required: 'La fecha de nacimiento es obligatoria',
-        pattern: {
-          value: /^\d{4}-\d{2}-\d{2}$/,
-          message: 'El formato debe ser YYYY-MM-DD',
-        },
-      },
+      type: 'date',
+      // El navegador se encarga del formato, solo necesitamos la validación de requerido.
+      validation: { required: 'La fecha de nacimiento es obligatoria' },
     },
     {
       name: 'typeDoc',
@@ -74,7 +68,20 @@ export const CreatePersonForm: React.FC<CreatePersonFormProps> = ({ onFormSubmit
       name: 'docNumber',
       label: 'Número de Documento',
       type: 'text',
-      placeholder: 'Opcional',
+      placeholder: 'XXXX-XXXX-XXXX',
+    },
+    {
+      name: 'email',
+      label: 'Correo Electrónico',
+      type: 'email',
+      placeholder: 'ejemplo@correo.com',
+      validation: {
+        // Opcional, pero si se ingresa, debe ser un email válido.
+        pattern: {
+          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+          message: 'Dirección de correo electrónico no válida',
+        },
+      },
     },
   ];
 
@@ -88,6 +95,7 @@ export const CreatePersonForm: React.FC<CreatePersonFormProps> = ({ onFormSubmit
     // Limpia los campos opcionales si están vacíos para no enviarlos
     const payload = { ...data };
     if (payload.docNumber === '') delete (payload as Partial<PersonRequest>).docNumber;
+    if (payload.email === '') delete (payload as Partial<PersonRequest>).email;
     // if (payload.typeDoc === '') delete (payload as Partial<PersonRequest>).typeDoc;
 
     toast.promise(CreatePerson(payload, token), {

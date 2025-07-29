@@ -12,6 +12,7 @@ export type DocType = "DNI" | "Passport" | "CE";
  * Representa la información personal de un individuo.
  */
 export interface Person {
+  id: string;
   name: string;
   middleName?: string;
   lastName: string;
