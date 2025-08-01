@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, Controller, SubmitHandler, FieldValues, RegisterOptions, Path, DefaultValues, PathValue } from 'react-hook-form';
 import { Input } from './Input';
 import { Select } from './Select';
@@ -34,8 +34,17 @@ const ReusableForm = <T extends FieldValues>({
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<T>({ defaultValues });
+
+  useEffect(() => {
+    if (defaultValues) {
+      reset(defaultValues);
+    } else {
+      reset({} as DefaultValues<T>);
+    }
+  }, [defaultValues, reset]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

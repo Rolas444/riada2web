@@ -33,6 +33,8 @@ export const updatePerson = async (
 ): Promise<PersonResponse> => {
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001/api/v1";
+  
+  console.log('Updating person with ID:', personId, 'Data:', personData);
 
   const response = await fetch(`${apiUrl}/protected/person/`, {
     method: "PUT",

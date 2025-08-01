@@ -14,7 +14,7 @@ export const TabMembershipData = ({ person }: TabMembershipDataProps) => {
     }
 
     return (
-        <div className="p-4">
+        <div className="p-4 dark:text-gray-300">
             <h3 className="text-lg font-semibold">Membresía de {person.name}</h3>
             <div className="mt-2 text-center text-gray-500">
                 <p>La información de la membresía se mostrará aquí.</p>

@@ -1,4 +1,4 @@
-import ReusableForm, { FieldConfig } from "@/components/ui/Form";
+import ReusableForm from "@/components/ui/Form";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { PersonRequest } from "@/features/persons/types/personTypes";
 import { toast } from "sonner";
@@ -14,16 +14,13 @@ interface CreatePersonFormProps {
 
 export const CreatePersonForm: React.FC<CreatePersonFormProps> = ({ onFormSubmit, personToEdit }) => {
     const token = useAuthStore((state) => state.token);
-
- 
-
     
   const handleSubmit = (data: PersonRequest) => {
     if (!token) {
       toast.error('No estás autenticado. Por favor, inicia sesión de nuevo.');
       return;
     }
-
+    // console.log('Datos del formulario:', data);
     // Capitaliza y limpia los campos antes de enviar
     const payload = {
       ...data,
@@ -63,13 +60,25 @@ export const CreatePersonForm: React.FC<CreatePersonFormProps> = ({ onFormSubmit
     }
   };
 
-return (
+  const defaultValues = personToEdit ? {
+    id: personToEdit.id,
+    name: personToEdit.name,
+    middleName: personToEdit.middleName,
+    lastName: personToEdit.lastName,
+    sex: personToEdit.sex,
+    birthday: personToEdit.birthday ? new Date(personToEdit.birthday).toISOString().split('T')[0] : '',
+    typeDoc: personToEdit.typeDoc ?? undefined,
+    docNumber: personToEdit.docNumber || '',
+    email: personToEdit.email || '',
+  } : undefined;
+
+  return (
     <ReusableForm
       fields={PersonFormConfig}
       onSubmit={handleSubmit}
       submitButtonText={personToEdit ? "Actualizar" : "Guardar"}
+      defaultValues={defaultValues}
     />
   );
-
 
 }

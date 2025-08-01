@@ -10,6 +10,7 @@ export interface NewPersonPayload {
 
 
 export interface PersonRequest {
+  id?: string; // Opcional para la creación, requerido para la edición
   name: string;
   middleName?: string;
   lastName: string;

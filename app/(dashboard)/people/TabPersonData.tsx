@@ -16,7 +16,7 @@ export const TabPersonData = ({ person, onEditClick }: TabPersonDataProps) => {
     }
 
     return (
-        <div className="p-4 space-y-2">
+        <div className="p-4 space-y-2 dark:text-gray-300">
             <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold">{`${person.name} ${person.middleName} ${person.lastName}`}</h3>
                 <button 
