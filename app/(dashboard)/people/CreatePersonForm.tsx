@@ -1,122 +1,73 @@
 import ReusableForm, { FieldConfig } from "@/components/ui/Form";
 import { useAuthStore } from "@/features/auth/store/authStore";
-import { NewPersonPayload, PersonRequest } from "@/features/persons/types/personTypes";
+import { PersonRequest } from "@/features/persons/types/personTypes";
 import { toast } from "sonner";
-import { CreatePerson } from "@/features/persons/api/personApi";
+import { CreatePerson, updatePerson } from "@/features/persons/api/personApi";
+import { capitalizeWords } from "@/lib/textUtils";
+import { PersonFormConfig } from "@/features/persons/config/personFormConfig";
+import { Person } from "@/core/domain/person";
 
 interface CreatePersonFormProps {
     onFormSubmit?: () => void;
+    personToEdit?: Person | null;
 }
 
-export const CreatePersonForm: React.FC<CreatePersonFormProps> = ({ onFormSubmit }) => {
+export const CreatePersonForm: React.FC<CreatePersonFormProps> = ({ onFormSubmit, personToEdit }) => {
     const token = useAuthStore((state) => state.token);
 
-    // Configuración de campos para el formulario de Persona, basado en PersonRequest
-  const personFormConfig: FieldConfig<PersonRequest>[] = [
-    {
-      name: 'name',
-      label: 'Nombres',
-      type: 'text',
-      placeholder: 'Ingrese los nombres',
-      validation: { required: 'El nombre es obligatorio' },
-    },
-    {
-      name: 'middleName',
-      label: 'Apellido Paterno',
-      type: 'text',
-      placeholder: 'Ingrese el apellido paterno',
-      // Aunque es opcional en el tipo, a menudo es un requisito de negocio
-      validation: { required: 'El apellido paterno es obligatorio' },
-    },
-    {
-      name: 'lastName',
-      label: 'Apellido Materno',
-      type: 'text',
-      placeholder: 'Ingrese el apellido materno',
-      validation: { required: 'El apellido materno es obligatorio' },
-    },
-    {
-      name: 'sex',
-      label: 'Sexo',
-      type: 'select',
-      options: [
-        { value: '', label: 'Seleccione...' },
-        { value: 'M', label: 'Masculino' },
-        { value: 'F', label: 'Femenino' },
-      ],
-      validation: { required: 'Debe seleccionar un sexo' },
-    },
-    {
-      name: 'birthday',
-      label: 'Fecha de Nacimiento',
-      type: 'date',
-      // El navegador se encarga del formato, solo necesitamos la validación de requerido.
-      validation: { required: 'La fecha de nacimiento es obligatoria' },
-    },
-    {
-      name: 'typeDoc',
-      label: 'Tipo de Documento',
-      type: 'select',
-      options: [
-        { value: '', label: 'Seleccione...' },
-        { value: 'DNI', label: 'DNI' },
-        { value: 'Passport', label: 'Pasaporte' },
-        { value: 'CE', label: 'Carnet de Extranjería' },
-      ],
-    },
-    {
-      name: 'docNumber',
-      label: 'Número de Documento',
-      type: 'text',
-      placeholder: 'XXXX-XXXX-XXXX',
-    },
-    {
-      name: 'email',
-      label: 'Correo Electrónico',
-      type: 'email',
-      placeholder: 'ejemplo@correo.com',
-      validation: {
-        // Opcional, pero si se ingresa, debe ser un email válido.
-        pattern: {
-          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-          message: 'Dirección de correo electrónico no válida',
-        },
-      },
-    },
-  ];
+ 
 
     
-  const handleCreatePerson = (data: PersonRequest) => {
+  const handleSubmit = (data: PersonRequest) => {
     if (!token) {
       toast.error('No estás autenticado. Por favor, inicia sesión de nuevo.');
       return;
     }
 
-    // Limpia los campos opcionales si están vacíos para no enviarlos
-    const payload = { ...data };
+    // Capitaliza y limpia los campos antes de enviar
+    const payload = {
+      ...data,
+      name: capitalizeWords(data.name),
+      middleName: capitalizeWords(data.middleName),
+      lastName: capitalizeWords(data.lastName),
+    };
     if (payload.docNumber === '') delete (payload as Partial<PersonRequest>).docNumber;
     if (payload.email === '') delete (payload as Partial<PersonRequest>).email;
+    if (payload.birthday === '') delete (payload as Partial<PersonRequest>).birthday;
     // if (payload.typeDoc === '') delete (payload as Partial<PersonRequest>).typeDoc;
 
-    toast.promise(CreatePerson(payload, token), {
-      loading: 'Creando persona...',
-      success: (result) => {
-        if (onFormSubmit) {
-          onFormSubmit();
-        }
-        return result.message || 'Persona creada correctamente';
-      },
-      error: (error: any) => {
-        return error.message || 'Ocurrió un error inesperado.';
-      },
-    });
+    if (personToEdit) {
+      // Modo Edición
+      toast.promise(updatePerson(personToEdit.id, payload, token), {
+        loading: 'Actualizando persona...',
+        success: (result) => {
+          onFormSubmit?.();
+          return result.message || 'Persona actualizada correctamente';
+        },
+        error: (error: any) => {
+          return error.message || 'Ocurrió un error al actualizar.';
+        },
+      });
+    } else {
+      // Modo Creación
+      toast.promise(CreatePerson(payload, token), {
+        loading: 'Creando persona...',
+        success: (result) => {
+          onFormSubmit?.();
+          return result.message || 'Persona creada correctamente';
+        },
+        error: (error: any) => {
+          return error.message || 'Ocurrió un error inesperado.';
+        },
+      });
+    }
   };
 
 return (
     <ReusableForm
-      fields={personFormConfig}
-      onSubmit={handleCreatePerson}
-      submitButtonText="Crear Persona"
+      fields={PersonFormConfig}
+      onSubmit={handleSubmit}
+      submitButtonText={personToEdit ? "Actualizar" : "Guardar"}
     />
   );
 

@@ -2,13 +2,15 @@ import React from 'react';
 import { Person } from "@/core/domain/person";
 
 interface PeopleTableProps {
-  users: Person[];
+  persons: Person[];
+  onRowClick: (person: Person) => void;
+  selectedPersonId?: string | null;
 }
 
-const PeopleTable: React.FC<PeopleTableProps> = ({ users: people }) => {
+const PeopleTable: React.FC<PeopleTableProps> = ({ persons: people, onRowClick, selectedPersonId }) => {
   const columnsCount = 6;
 
-  const calculateAge = (birthdayString: string): number | null => {
+  const calculateAge = (birthdayString?: string): number | null => {
     if (!birthdayString) return null;
     const birthDate = new Date(birthdayString);
     if (isNaN(birthDate.getTime())) return null; // Fecha inválida
@@ -50,11 +52,17 @@ const PeopleTable: React.FC<PeopleTableProps> = ({ users: people }) => {
         <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
           {people.length > 0 ? (
             people.map((person) => (
-              <tr key={person.id}>
+              <tr 
+                key={person.id}
+                onClick={() => onRowClick(person)}
+                className={`cursor-pointer transition-colors hover:bg-gray-100 dark:hover:bg-gray-700/50 ${
+                  selectedPersonId === person.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                }`}
+              >
                 <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 dark:text-white">{`${person.name} ${person.middleName} ${person.lastName}`}</td>
                 <td className="whitespace-nowrap px-4 py-2 text-gray-700 dark:text-gray-200">{person.typeDoc && person.docNumber ? `${person.typeDoc}: ${person.docNumber}` : 'N/A'}</td>
-                <td className="whitespace-nowrap px-4 py-2 text-gray-700 dark:text-gray-200">{person.email || 'N/A'}</td>
-                <td className="whitespace-nowrap px-4 py-2 text-gray-700 dark:text-gray-200">{new Date(person.birthday).toLocaleDateString()}</td>
+                <td className="whitespace-nowrap px-4 py-2 text-gray-700 dark:text-gray-200">{person.email ?? 'N/A'}</td>
+                <td className="whitespace-nowrap px-4 py-2 text-gray-700 dark:text-gray-200">{person.birthday ? new Date(person.birthday).toLocaleDateString() : 'N/A'}</td>
                 <td className="whitespace-nowrap px-4 py-2 text-gray-700 dark:text-gray-200">
                   {calculateAge(person.birthday) ?? 'N/A'}
                 </td>
