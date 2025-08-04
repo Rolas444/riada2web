@@ -1,4 +1,5 @@
 import { Person } from "@/core/domain/person";
+import { CalculateAge } from "@/lib/utils";
 import { Edit } from "lucide-react";
 
 interface TabPersonDataProps {
@@ -31,6 +32,7 @@ export const TabPersonData = ({ person, onEditClick }: TabPersonDataProps) => {
             <p><span className="font-semibold text-gray-600 dark:text-gray-400">Documento:</span> {person.typeDoc && person.docNumber ? `${person.typeDoc}: ${person.docNumber}` : 'N/A'}</p>
             <p><span className="font-semibold text-gray-600 dark:text-gray-400">Nacimiento:</span> {person.birthday ? new Date(person.birthday).toLocaleDateString() : 'N/A'}</p>
             <p><span className="font-semibold text-gray-600 dark:text-gray-400">Sexo:</span> {person.sex === 'M' ? 'Masculino' : 'Femenino'}</p>
+            <p><span className="font-semibold text-gray-600 dark:text-gray-400">Edad:</span> {CalculateAge(person.birthday)}</p>
         </div>
     );
 }

@@ -36,7 +36,7 @@ const Tabs: React.FC<TabsProps> = ({ tabs }) => {
           ))}
         </nav>
       </div>
-      <div className="mt-6">{tabs[activeTab] && tabs[activeTab].content}</div>
+      <div className="mt-4">{tabs[activeTab] && tabs[activeTab].content}</div>
     </div>
   );
 };

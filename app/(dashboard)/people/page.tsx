@@ -136,7 +136,7 @@ export default function PeoplePage() {
       </div>
 
       {/* Panel de detalles con pestañas */}
-      <div className="mt-6 h-[40vh] overflow-y-auto rounded-lg bg-gray-50 p-1 dark:border dark:border-gray-700 dark:bg-gray-800">
+      <div className="mt-2 h-[30vh] overflow-y-auto rounded-lg bg-gray-50 p-1 dark:border dark:border-gray-700 dark:bg-gray-800">
         <Tabs tabs={TabConfig} />
       </div>
 

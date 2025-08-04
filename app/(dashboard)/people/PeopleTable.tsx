@@ -1,5 +1,9 @@
 import React from 'react';
 import { Person } from "@/core/domain/person";
+import { CalculateAge } from "@/lib/utils";
+
+// Importing the CalculateAge function from utils
+const calculateAge = CalculateAge;
 
 interface PeopleTableProps {
   persons: Person[];
@@ -10,24 +14,12 @@ interface PeopleTableProps {
 const PeopleTable: React.FC<PeopleTableProps> = ({ persons: people, onRowClick, selectedPersonId }) => {
   const columnsCount = 6;
 
-  const calculateAge = (birthdayString?: string): number | null => {
-    if (!birthdayString) return null;
-    const birthDate = new Date(birthdayString);
-    if (isNaN(birthDate.getTime())) return null; // Fecha inválida
-
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age >= 0 ? age : null;
-  };
+  
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+    <div className="overflow-auto max-h-[450px] rounded-lg border border-gray-200 dark:border-gray-700">
       <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm dark:divide-gray-700 dark:bg-gray-800">
-        <thead className="bg-gray-50 dark:bg-gray-700/50">
+        <thead className="sticky top-0 bg-gray-50 dark:bg-gray-700/80">
           <tr>
             <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900 dark:text-white">
               Nombre Completo
