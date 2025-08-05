@@ -19,7 +19,6 @@ import { TabMembershipData } from "./TabMembershipData";
 export default function PeoplePage() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
-  const [formKey, setFormKey] = useState(Date.now());
 
   const [allPersons, setAllPersons] = useState<Person[]>([]);
   const [loading, setLoading] = useState(true);
@@ -81,8 +80,6 @@ export default function PeoplePage() {
 
   const handleCloseModal = () => {
     setModalOpen(false);
-    // Al cerrar el modal, cambiamos la key para forzar el re-renderizado del formulario, limpiándolo.
-    setFormKey(Date.now());
   };
 
   const handleFormSuccess = () => {
@@ -176,8 +173,8 @@ export default function PeoplePage() {
             : 'Completa los campos para registrar una Persona en el sistema.'
           }
         </p>
-        <CreatePersonForm 
-          key={formKey} 
+        <CreatePersonForm
+          key={modalMode === 'edit' && selectedPerson ? selectedPerson.id : 'new-person-form'}
           onFormSubmit={handleFormSuccess}
           personToEdit={modalMode === 'edit' ? selectedPerson : null}
         />

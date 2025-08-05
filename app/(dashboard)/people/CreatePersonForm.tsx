@@ -6,6 +6,7 @@ import { CreatePerson, updatePerson } from "@/features/persons/api/personApi";
 import { capitalizeWords } from "@/lib/textUtils";
 import { PersonFormConfig } from "@/features/persons/config/personFormConfig";
 import { Person } from "@/core/domain/person";
+import { useEffect } from "react";
 
 interface CreatePersonFormProps {
     onFormSubmit?: () => void;
@@ -71,6 +72,9 @@ export const CreatePersonForm: React.FC<CreatePersonFormProps> = ({ onFormSubmit
     docNumber: personToEdit.docNumber || '',
     email: personToEdit.email || '',
   } : undefined;
+
+  // useEffect(()=>{
+  // }, [personToEdit]);
 
   return (
     <ReusableForm
