@@ -1,3 +1,6 @@
+import { Address } from "./address";
+import { Phone } from "./phone";
+
 /**
  * Define el género de una persona.
  */
@@ -22,4 +25,6 @@ export interface Person {
   docNumber?: string;
   typeDoc?: DocType;
   photo?: string;
+  addresses: Address[]; // Array de IDs de direcciones
+  phones: Phone[]; // Array de IDs de teléfonos
 }

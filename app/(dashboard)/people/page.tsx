@@ -26,31 +26,39 @@ export default function PeoplePage() {
   const token = useAuthStore((state) => state.token);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
+  const [lastSelectedPersonId, setLastSelectedPersonId] = useState<string | null>(null);
 
 
   const handleRowClick = (person: Person) => {
-    // Si la persona clickeada ya está seleccionada, la deseleccionamos (poniendo el estado a null).
-    // Si no, la seleccionamos.
-    setSelectedPerson(prevSelected => (prevSelected && prevSelected.id === person.id) ? null : person);
+    if (selectedPerson?.id === person.id) {
+      // Si la persona clickeada ya está seleccionada, la deseleccionamos.
+      setSelectedPerson(null);
+    } else {
+      // De lo contrario, la seleccionamos y guardamos su ID.
+      setSelectedPerson(person);
+      setLastSelectedPersonId(person.id);
+    }
   };
 
   //carga de datos
   
-  const fetchPersons = useCallback(async (query: string | null = null) => {
+  const fetchPersons = useCallback(async (query: string | null = null): Promise<Person[]> => {
     if (!token) {
       setError('No estás autenticado.');
       setLoading(false);
-      return;
+      return [];
     }
     try {
       setLoading(true);
       setError(null);
       const fetchedPersons = await getPersons(token, query);
       setAllPersons(fetchedPersons);
+      return fetchedPersons;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Ocurrió un error desconocido.';
       setError(errorMessage);
       toast.error(errorMessage);
+      return [];
     } finally {
       setLoading(false);
     }
@@ -82,13 +90,17 @@ export default function PeoplePage() {
     setModalOpen(false);
   };
 
-  const handleFormSuccess = () => {
+  const handleFormSuccess = async () => {
     handleCloseModal();
-    // Refrescar la lista de usuarios después de una creación exitosa.
-    // La notificación de éxito ya la maneja el formulario. 
-    fetchPersons(); // Recarga la lista
-    setSelectedPerson(null); // Limpia la selección para que el panel de detalles se actualice
-  }
+    if (modalMode === 'edit' && lastSelectedPersonId) {
+      const updatedPersons = await fetchPersons();
+      const personToReselect = updatedPersons.find(p => p.id === lastSelectedPersonId);
+      setSelectedPerson(personToReselect || null);
+    } else {
+      await fetchPersons(); // Recarga la lista
+      setSelectedPerson(null); // Limpia la selección para que el panel de detalles se actualice
+    }
+  };
 
   const handleSearch = () => {
     fetchPersons(searchQuery);
