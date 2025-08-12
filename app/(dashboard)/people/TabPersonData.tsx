@@ -1,6 +1,6 @@
 import { Person } from "@/core/domain/person";
 import { CalculateAge } from "@/lib/utils";
-import { Edit } from "lucide-react";
+import { Edit, MapPin, Phone } from "lucide-react";
 
 interface TabPersonDataProps {
     person: Person | null;
@@ -18,7 +18,7 @@ export const TabPersonData = ({ person, onEditClick }: TabPersonDataProps) => {
 
     return (
         <div className="flex divide-x divide-gray-200 dark:divide-gray-700">
-            {/* Primera sección */}
+            {/* Sección de Datos Personales */}
             <div className="w-1/2 p-4 space-y-2 dark:text-gray-300">
                 <div className="flex justify-between items-center">
                     <h3 className="text-lg font-semibold">{`${person.name} ${person.middleName} ${person.lastName}`}</h3>
@@ -36,9 +36,38 @@ export const TabPersonData = ({ person, onEditClick }: TabPersonDataProps) => {
                 <p><span className="font-semibold text-gray-600 dark:text-gray-400">Sexo:</span> {person.sex === 'M' ? 'Masculino' : 'Femenino'}</p>
                 <p><span className="font-semibold text-gray-600 dark:text-gray-400">Edad:</span> {CalculateAge(person.birthday)}</p>
             </div>
-            {/* Segunda sección */}
-            <div className="w-1/2 p-4">
-                {/* Aquí puedes agregar el contenido para la segunda sección */}
+            {/* Sección de Contacto */}
+            <div className="w-1/2 p-4 space-y-4 dark:text-gray-300">
+                <div>
+                    <h4 className="text-md font-semibold mb-2 flex items-center">
+                        <Phone size={16} className="mr-2" />
+                        Teléfonos
+                    </h4>
+                    {person.phones && person.phones.length > 0 ? (
+                        <ul className="list-disc list-inside space-y-1 text-sm pl-2">
+                            {person.phones.map(phone => (
+                                <li key={phone.id}>{`${phone.number}`}</li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="text-sm text-gray-500">No hay teléfonos registrados.</p>
+                    )}
+                </div>
+                <div>
+                    <h4 className="text-md font-semibold mb-2 flex items-center">
+                        <MapPin size={16} className="mr-2" />
+                        Direcciones
+                    </h4>
+                    {person.addresses && person.addresses.length > 0 ? (
+                        <ul className="list-disc list-inside space-y-1 text-sm pl-2">
+                            {person.addresses.map(address => (
+                                <li key={address.id}>{`${address.address}`}</li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="text-sm text-gray-500">No hay direcciones registradas.</p>
+                    )}
+                </div>
             </div>
         </div>
     );
