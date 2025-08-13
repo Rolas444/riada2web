@@ -1,6 +1,6 @@
 import { Person } from "@/core/domain/person";
 import { CalculateAge } from "@/lib/utils";
-import { Edit, MapPin, Phone } from "lucide-react";
+import { Edit, MapPin, Phone, Plus } from "lucide-react";
 
 interface TabPersonDataProps {
     person: Person | null;
@@ -39,10 +39,20 @@ export const TabPersonData = ({ person, onEditClick }: TabPersonDataProps) => {
             {/* Sección de Contacto */}
             <div className="w-1/2 p-4 space-y-4 dark:text-gray-300">
                 <div>
-                    <h4 className="text-md font-semibold mb-2 flex items-center">
-                        <Phone size={16} className="mr-2" />
-                        Teléfonos
-                    </h4>
+                    <div className="flex justify-between items-center mb-2">
+                        <h4 className="text-md font-semibold flex items-center">
+                            <Phone size={16} className="mr-2" />
+                            Teléfonos
+                        </h4>
+                        {(!person.phones || person.phones.length <= 1) && (
+                            <button 
+                                className="p-1.5 text-gray-500 rounded-md hover:cursor-pointer hover:bg-gray-100 hover:text-green-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-green-400 transition-colors"
+                                aria-label={`Añadir teléfono a ${person.name}`}
+                            >
+                                <Plus size={18} />
+                            </button>
+                        )}
+                    </div>
                     {person.phones && person.phones.length > 0 ? (
                         <ul className="list-disc list-inside space-y-1 text-sm pl-2">
                             {person.phones.map(phone => (
