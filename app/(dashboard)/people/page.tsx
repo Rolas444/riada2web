@@ -2,7 +2,8 @@
 
 import { Button } from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
-import { Person } from "@/core/domain/person";
+import { Person} from "@/core/domain/person";
+import { Phone } from "@/core/domain/phone";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { getPersons } from "@/features/persons/api/personApi";
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -13,6 +14,7 @@ import { Input } from '@/components/ui/Input';
 import Tabs, { Tab } from "@/components/ui/Tabs";
 import { TabPersonData } from "./TabPersonData";
 import { TabMembershipData } from "./TabMembershipData";
+import AddPhoneForm from "./AddPhoneForm";
 
 
 //página principal
@@ -27,6 +29,9 @@ export default function PeoplePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [lastSelectedPersonId, setLastSelectedPersonId] = useState<string | null>(null);
+  const [isAddPhoneModalOpen, setAddPhoneModalOpen] = useState(false);
+  const [addPhoneFormKey, setAddPhoneFormKey] = useState(0);
+  const [personFormKey, setPersonFormKey] = useState(Date.now());
 
 
   const handleRowClick = (person: Person) => {
@@ -109,6 +114,7 @@ export default function PeoplePage() {
   const handleOpenCreateModal = () => {
     setModalMode('create');
     setSelectedPerson(null); // Limpiar la selección al crear uno nuevo
+    setPersonFormKey(Date.now()); // Actualiza la key para forzar el reinicio del formulario
     setModalOpen(true);
   };
 
@@ -118,10 +124,39 @@ export default function PeoplePage() {
     setModalOpen(true);
   };
 
+  const handleOpenAddPhoneModal = () => {
+    if (selectedPerson) {
+      // Cambiamos la key para forzar que el componente del formulario se vuelva a montar y se reinicie.
+      setAddPhoneFormKey(prevKey => prevKey + 1);
+      setAddPhoneModalOpen(true);
+    }
+  };
+
+  const handleCloseAddPhoneModal = () => {
+    setAddPhoneModalOpen(false);
+  };
+
+  const handlePhoneAdded = (newPhone: Phone) => {
+    handleCloseAddPhoneModal();
+    if (selectedPerson) {
+      // 1. Actualizar el estado de la persona seleccionada para reflejar el cambio instantáneamente.
+      const updatedPerson = {
+        ...selectedPerson,
+        phones: [...(selectedPerson.phones || []), newPhone],
+      };
+      setSelectedPerson(updatedPerson);
+
+      // 2. Actualizar la lista completa de personas para mantener la consistencia sin recargar.
+      setAllPersons(prevPersons => 
+        prevPersons.map(p => p.id === selectedPerson.id ? updatedPerson : p)
+      );
+    }
+  };
+
   const TabConfig: Tab[]=[
     {
       label: 'Datos Personales',
-      content: <TabPersonData person={selectedPerson} onEditClick={handleOpenEditModal} />
+      content: <TabPersonData person={selectedPerson} onEditClick={handleOpenEditModal} onAddPhoneClick={handleOpenAddPhoneModal} />
     },
     {
       label: 'Membresía',
@@ -186,11 +221,25 @@ export default function PeoplePage() {
           }
         </p>
         <CreatePersonForm
-          key={modalMode === 'edit' && selectedPerson ? selectedPerson.id : 'new-person-form'}
+          key={modalMode === 'edit' && selectedPerson ? selectedPerson.id : personFormKey}
           onFormSubmit={handleFormSuccess}
           personToEdit={modalMode === 'edit' ? selectedPerson : null}
         />
       </Modal>
+
+      {selectedPerson && (
+        <Modal
+          isOpen={isAddPhoneModalOpen}
+          onClose={handleCloseAddPhoneModal}
+          title={`Añadir Teléfono a ${selectedPerson.name}`}
+        >
+          <AddPhoneForm
+            key={addPhoneFormKey}
+            personId={selectedPerson.id}
+            onFormSubmit={handlePhoneAdded}
+          />
+        </Modal>
+      )}
     </div>
   );
 }

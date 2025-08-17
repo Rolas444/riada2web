@@ -5,9 +5,10 @@ import { Edit, MapPin, Phone, Plus } from "lucide-react";
 interface TabPersonDataProps {
     person: Person | null;
     onEditClick: (person: Person) => void;
+    onAddPhoneClick: () => void;
 }
 
-export const TabPersonData = ({ person, onEditClick }: TabPersonDataProps) => {
+export const TabPersonData = ({ person, onEditClick, onAddPhoneClick }: TabPersonDataProps) => {
     if (!person) {
         return (
             <div className="p-4 text-center text-gray-500">
@@ -44,19 +45,18 @@ export const TabPersonData = ({ person, onEditClick }: TabPersonDataProps) => {
                             <Phone size={16} className="mr-2" />
                             Teléfonos
                         </h4>
-                        {(!person.phones || person.phones.length <= 1) && (
-                            <button 
-                                className="p-1.5 text-gray-500 rounded-md hover:cursor-pointer hover:bg-gray-100 hover:text-green-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-green-400 transition-colors"
-                                aria-label={`Añadir teléfono a ${person.name}`}
-                            >
-                                <Plus size={18} />
-                            </button>
-                        )}
+                        <button 
+                            onClick={onAddPhoneClick}
+                            className="p-1.5 text-gray-500 rounded-md hover:cursor-pointer hover:bg-gray-100 hover:text-green-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-green-400 transition-colors"
+                            aria-label={`Añadir teléfono a ${person.name}`}
+                        >
+                            <Plus size={18} />
+                        </button>
                     </div>
                     {person.phones && person.phones.length > 0 ? (
                         <ul className="list-disc list-inside space-y-1 text-sm pl-2">
                             {person.phones.map(phone => (
-                                <li key={phone.id}>{`${phone.number}`}</li>
+                                <li key={phone.id}>{`${phone.phone}`}</li>
                             ))}
                         </ul>
                     ) : (

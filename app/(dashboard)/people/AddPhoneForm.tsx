@@ -3,11 +3,12 @@
 import ReusableForm, { FieldConfig } from "@/components/ui/Form";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { toast } from "sonner";
-// import { addPhoneToPerson } from "@/features/persons/api/personApi";
+import { addPhoneToPerson } from "@/features/persons/api/personApi";
+import { Phone } from "@/core/domain/phone";
 
 interface AddPhoneFormProps {
     personId: string;
-    onFormSubmit?: () => void;
+    onFormSubmit?: (newPhone: Phone) => void;
 }
 
 const AddPhoneForm: React.FC<AddPhoneFormProps> = ({ personId, onFormSubmit }) => {
@@ -15,7 +16,7 @@ const AddPhoneForm: React.FC<AddPhoneFormProps> = ({ personId, onFormSubmit }) =
 
     const phoneFormConfig: FieldConfig<any>[] = [
         {
-            name: 'number',
+            name: 'phone',
             label: 'Número de Teléfono',
             type: 'text' as const,
             placeholder: 'Ingrese el número de teléfono',
@@ -27,14 +28,22 @@ const AddPhoneForm: React.FC<AddPhoneFormProps> = ({ personId, onFormSubmit }) =
         }
     ];
 
-    const handleSubmit = (data: { number: string }) => {
+    const handleSubmit = (data: { phone: string }) => {
         if (!token) {
             toast.error('No estás autenticado.');
             return;
         }
-        console.log("Simulando envío de datos:", { number: data.number, personId });
-        toast.success("Teléfono agregado (simulación).");
-        onFormSubmit?.();
+
+        toast.promise(addPhoneToPerson(token, personId, data.phone), {
+            loading: 'Agregando teléfono...',
+            success: (result) => {
+                onFormSubmit?.(result.data); // Pasamos el objeto 'Phone' desde la propiedad 'data'
+                return result.message || 'Teléfono agregado correctamente.';
+            },
+            error: (error: any) => {
+                return error.message || 'Ocurrió un error al agregar el teléfono.';
+            }
+        });
     };
 
     return (

@@ -1,7 +1,13 @@
+import { Phone } from "@/core/domain/phone";
 import { DocType, Sex } from "@/core/domain/person";
 
 export interface PersonResponse {
   message: string;
+  data?: any; // Opcional para respuestas genéricas
+}
+
+export interface AddPhoneResponse extends PersonResponse {
+  data: Phone;
 }
 
 export interface NewPersonPayload {
