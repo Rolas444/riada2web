@@ -1,14 +1,16 @@
 import { Person } from "@/core/domain/person";
 import { CalculateAge } from "@/lib/utils";
 import { Edit, MapPin, Phone, Plus } from "lucide-react";
+import { Phone as PhoneType } from "@/core/domain/phone";
 
 interface TabPersonDataProps {
     person: Person | null;
     onEditClick: (person: Person) => void;
     onAddPhoneClick: () => void;
+    onEditPhoneClick: (phone: PhoneType) => void;
 }
 
-export const TabPersonData = ({ person, onEditClick, onAddPhoneClick }: TabPersonDataProps) => {
+export const TabPersonData = ({ person, onEditClick, onAddPhoneClick, onEditPhoneClick }: TabPersonDataProps) => {
     if (!person) {
         return (
             <div className="p-4 text-center text-gray-500">
@@ -54,9 +56,18 @@ export const TabPersonData = ({ person, onEditClick, onAddPhoneClick }: TabPerso
                         </button>
                     </div>
                     {person.phones && person.phones.length > 0 ? (
-                        <ul className="list-disc list-inside space-y-1 text-sm pl-2">
+                        <ul className="space-y-1 text-sm">
                             {person.phones.map(phone => (
-                                <li key={phone.id}>{`${phone.phone}`}</li>
+                                <li key={phone.id} className="flex justify-between items-center group">
+                                    <span className="transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400">{phone.phone}</span>
+                                    <button
+                                        onClick={() => onEditPhoneClick(phone)}
+                                        className="p-1 text-gray-400 hover:cursor-pointer rounded-md hover:bg-gray-200 hover:text-blue-600 dark:hover:bg-gray-700 dark:hover:text-blue-400 transition-colors opacity-0 group-hover:opacity-100"
+                                        aria-label={`Editar teléfono ${phone.phone}`}
+                                    >
+                                        <Edit size={14} />
+                                    </button>
+                                </li>
                             ))}
                         </ul>
                     ) : (

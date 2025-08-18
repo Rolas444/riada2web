@@ -1,5 +1,6 @@
 import { Phone } from "@/core/domain/phone";
 import { DocType, Sex } from "@/core/domain/person";
+import { Address } from "@/core/domain/address";
 
 export interface PersonResponse {
   message: string;
@@ -10,6 +11,9 @@ export interface AddPhoneResponse extends PersonResponse {
   data: Phone;
 }
 
+export interface AddAddressResponse extends PersonResponse {
+  data: Address;
+}
 export interface NewPersonPayload {
   person: PersonRequest;
 }

@@ -1,5 +1,6 @@
 import { Person } from "@/core/domain/person";
-import { AddPhoneResponse, PersonRequest, PersonResponse } from "../types/personTypes";
+import { AddAddressResponse, AddPhoneResponse, PersonRequest, PersonResponse } from "../types/personTypes";
+import { Phone } from "@/core/domain/phone";
 
 export const CreatePerson = async (
   personData: PersonRequest,
@@ -34,9 +35,8 @@ export const updatePerson = async (
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001/api/v1";
   
-  console.log('Updating person with ID:', personId, 'Data:', personData);
-
-  const response = await fetch(`${apiUrl}/protected/person/`, {
+  //usa la misma dirección que de creación y el mismo médodo 
+  const response = await fetch(`${apiUrl}/protected/person`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -106,4 +106,54 @@ export const addPhoneToPerson  = async(
   }
 
   return result as AddPhoneResponse;
+}
+
+export const updatePhoneToPerson  = async(
+  token: string,
+  phone: Phone
+): Promise<AddPhoneResponse> => {
+  const apiUrl =
+    process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001/api/v1";
+
+  const response = await fetch(`${apiUrl}/protected/phone`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(phone),
+  });
+  console.log('Updating phone:', phone);
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.error || "Ocurrió un error al actualizar el teléfono.");
+  }
+
+  return result as AddPhoneResponse;
+}
+
+export const addAddressToPerson  = async(
+  token: string,
+  personId: string,
+  address: string
+): Promise<AddAddressResponse> => {
+  const apiUrl =
+    process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001/api/v1";
+
+  const response = await fetch(`${apiUrl}/protected/phone`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ address, personId }),
+  });
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.error || "Ocurrió un error al agregar el teléfono.");
+  }
+
+  return result as AddAddressResponse;
 }

@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/Input';
 import Tabs, { Tab } from "@/components/ui/Tabs";
 import { TabPersonData } from "./TabPersonData";
 import { TabMembershipData } from "./TabMembershipData";
-import AddPhoneForm from "./AddPhoneForm";
+import AddPhoneForm from "./PhoneForm";
 
 
 //página principal
@@ -29,8 +29,10 @@ export default function PeoplePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [lastSelectedPersonId, setLastSelectedPersonId] = useState<string | null>(null);
-  const [isAddPhoneModalOpen, setAddPhoneModalOpen] = useState(false);
-  const [addPhoneFormKey, setAddPhoneFormKey] = useState(0);
+  const [isPhoneModalOpen, setPhoneModalOpen] = useState(false);
+  const [phoneModalMode, setPhoneModalMode] = useState<'create' | 'edit'>('create');
+  const [phoneToEdit, setPhoneToEdit] = useState<Phone | null>(null);
+  const [phoneFormKey, setPhoneFormKey] = useState(0);
   const [personFormKey, setPersonFormKey] = useState(Date.now());
 
 
@@ -126,27 +128,46 @@ export default function PeoplePage() {
 
   const handleOpenAddPhoneModal = () => {
     if (selectedPerson) {
-      // Cambiamos la key para forzar que el componente del formulario se vuelva a montar y se reinicie.
-      setAddPhoneFormKey(prevKey => prevKey + 1);
-      setAddPhoneModalOpen(true);
+      setPhoneModalMode('create');
+      setPhoneToEdit(null);
+      setPhoneFormKey(prevKey => prevKey + 1); // Reset form
+      setPhoneModalOpen(true);
     }
   };
 
-  const handleCloseAddPhoneModal = () => {
-    setAddPhoneModalOpen(false);
+  const handleClosePhoneModal = () => {
+    setPhoneModalOpen(false);
+    setPhoneToEdit(null);
   };
 
-  const handlePhoneAdded = (newPhone: Phone) => {
-    handleCloseAddPhoneModal();
+  const handleOpenEditPhoneModal = (phone: Phone) => {
     if (selectedPerson) {
-      // 1. Actualizar el estado de la persona seleccionada para reflejar el cambio instantáneamente.
-      const updatedPerson = {
-        ...selectedPerson,
-        phones: [...(selectedPerson.phones || []), newPhone],
-      };
+      setPhoneModalMode('edit');
+      setPhoneToEdit(phone);
+      setPhoneModalOpen(true);
+    }
+  }
+
+  const handlePhoneFormSuccess = (phoneData: Phone) => {
+    handleClosePhoneModal();
+    if (selectedPerson) {
+      let updatedPhones: Phone[];
+
+      if (phoneModalMode === 'create') {
+        // Add new phone
+        updatedPhones = [...(selectedPerson.phones || []), phoneData];
+      } else {
+        // Update existing phone
+        updatedPhones = (selectedPerson.phones || []).map(p => 
+          p.id === phoneData.id ? phoneData : p
+        );
+      }
+
+      // Optimistic update for selectedPerson
+      const updatedPerson = { ...selectedPerson, phones: updatedPhones };
       setSelectedPerson(updatedPerson);
 
-      // 2. Actualizar la lista completa de personas para mantener la consistencia sin recargar.
+      // Optimistic update for allPersons list
       setAllPersons(prevPersons => 
         prevPersons.map(p => p.id === selectedPerson.id ? updatedPerson : p)
       );
@@ -156,7 +177,7 @@ export default function PeoplePage() {
   const TabConfig: Tab[]=[
     {
       label: 'Datos Personales',
-      content: <TabPersonData person={selectedPerson} onEditClick={handleOpenEditModal} onAddPhoneClick={handleOpenAddPhoneModal} />
+      content: <TabPersonData person={selectedPerson} onEditClick={handleOpenEditModal} onAddPhoneClick={handleOpenAddPhoneModal} onEditPhoneClick={handleOpenEditPhoneModal} />
     },
     {
       label: 'Membresía',
@@ -229,14 +250,15 @@ export default function PeoplePage() {
 
       {selectedPerson && (
         <Modal
-          isOpen={isAddPhoneModalOpen}
-          onClose={handleCloseAddPhoneModal}
-          title={`Añadir Teléfono a ${selectedPerson.name}`}
+          isOpen={isPhoneModalOpen}
+          onClose={handleClosePhoneModal}
+          title={phoneModalMode === 'edit' ? `Editar Teléfono de ${selectedPerson.name}` : `Añadir Teléfono a ${selectedPerson.name}`}
         >
           <AddPhoneForm
-            key={addPhoneFormKey}
+            key={phoneFormKey}
             personId={selectedPerson.id}
-            onFormSubmit={handlePhoneAdded}
+            onFormSubmit={handlePhoneFormSuccess}
+            phoneToEdit={phoneToEdit}
           />
         </Modal>
       )}
