@@ -1,6 +1,12 @@
 import { Person } from "@/core/domain/person";
-import { AddAddressResponse, AddPhoneResponse, PersonRequest, PersonResponse } from "../types/personTypes";
+import {
+  AddAddressResponse,
+  AddPhoneResponse,
+  PersonRequest,
+  PersonResponse,
+} from "../types/personTypes";
 import { Phone } from "@/core/domain/phone";
+import { Address } from "@/core/domain/address";
 
 export const CreatePerson = async (
   personData: PersonRequest,
@@ -19,7 +25,7 @@ export const CreatePerson = async (
   });
 
   const result = await response.json();
-  
+
   if (!response.ok) {
     throw new Error(result.error || "Ocurrió un error al crear el registro.");
   }
@@ -34,8 +40,8 @@ export const updatePerson = async (
 ): Promise<PersonResponse> => {
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001/api/v1";
-  
-  //usa la misma dirección que de creación y el mismo médodo 
+
+  //usa la misma dirección que de creación y el mismo médodo
   const response = await fetch(`${apiUrl}/protected/person`, {
     method: "PUT",
     headers: {
@@ -48,7 +54,9 @@ export const updatePerson = async (
   const result = await response.json();
 
   if (!response.ok) {
-    throw new Error(result.message || "Ocurrió un error al actualizar el registro.");
+    throw new Error(
+      result.message || "Ocurrió un error al actualizar el registro."
+    );
   }
 
   return result;
@@ -77,13 +85,15 @@ export const getPersons = async (
   const result = await response.json();
 
   if (!response.ok) {
-    throw new Error(result.message || "Ocurrió un error al obtener las personas.");
+    throw new Error(
+      result.message || "Ocurrió un error al obtener las personas."
+    );
   }
 
   return result as Person[];
 };
 
-export const addPhoneToPerson  = async(
+export const addPhoneToPerson = async (
   token: string,
   personId: string,
   phoneNumber: string
@@ -106,9 +116,9 @@ export const addPhoneToPerson  = async(
   }
 
   return result as AddPhoneResponse;
-}
+};
 
-export const updatePhoneToPerson  = async(
+export const updatePhoneToPerson = async (
   token: string,
   phone: Phone
 ): Promise<AddPhoneResponse> => {
@@ -123,17 +133,19 @@ export const updatePhoneToPerson  = async(
     },
     body: JSON.stringify(phone),
   });
-  console.log('Updating phone:', phone);
+  console.log("Updating phone:", phone);
   const result = await response.json();
 
   if (!response.ok) {
-    throw new Error(result.error || "Ocurrió un error al actualizar el teléfono.");
+    throw new Error(
+      result.error || "Ocurrió un error al actualizar el teléfono."
+    );
   }
 
   return result as AddPhoneResponse;
-}
+};
 
-export const addAddressToPerson  = async(
+export const addAddressToPerson = async (
   token: string,
   personId: string,
   address: string
@@ -156,4 +168,28 @@ export const addAddressToPerson  = async(
   }
 
   return result as AddAddressResponse;
-}
+};
+
+export const updateAddressToPerson = async (
+  token: string,
+  address: Address
+): Promise<AddAddressResponse> => {
+  const apiUrl =
+    process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001/api/v1";
+
+  const response = await fetch(`${apiUrl}/protected/phone`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(address),
+  });
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.error || "Ocurrió un error al agregar el teléfono.");
+  }
+
+  return result as AddAddressResponse;
+};
