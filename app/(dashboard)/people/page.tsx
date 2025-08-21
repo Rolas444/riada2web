@@ -15,6 +15,7 @@ import Tabs, { Tab } from "@/components/ui/Tabs";
 import { TabPersonData } from "./TabPersonData";
 import { TabMembershipData } from "./TabMembershipData";
 import AddPhoneForm from "./PhoneForm";
+import AddAddressForm from "./AddressForm";
 
 
 //página principal
@@ -34,6 +35,12 @@ export default function PeoplePage() {
   const [phoneToEdit, setPhoneToEdit] = useState<Phone | null>(null);
   const [phoneFormKey, setPhoneFormKey] = useState(0);
   const [personFormKey, setPersonFormKey] = useState(Date.now());
+   
+  // Estado para el modal de direcciones
+  const [isAddressModalOpen, setAddressModalOpen] = useState(false);
+  const [addressModalMode, setAddressModalMode] = useState<'create' | 'edit'>('create');
+  const [addressToEdit, setAddressToEdit] = useState<any>(null);
+  const [addressFormKey, setAddressFormKey] = useState(0);
 
 
   const handleRowClick = (person: Person) => {
@@ -174,10 +181,66 @@ export default function PeoplePage() {
     }
   };
 
+  // Funciones para manejar direcciones
+  const handleOpenAddAddressModal = () => {
+    if (selectedPerson) {
+      setAddressModalMode('create');
+      setAddressToEdit(null);
+      setAddressFormKey(prevKey => prevKey + 1); // Reset form
+      setAddressModalOpen(true);
+    }
+  };
+
+  const handleOpenEditAddressModal = (address: any) => {
+    if (selectedPerson) {
+      setAddressModalMode('edit');
+      setAddressToEdit(address);
+      setAddressModalOpen(true);
+    }
+  };
+
+  const handleCloseAddressModal = () => {
+    setAddressModalOpen(false);
+    setAddressToEdit(null);
+  };
+
+  const handleAddressFormSuccess = (addressData: any) => {
+    handleCloseAddressModal();
+    if (selectedPerson) {
+      let updatedAddresses: any[];
+
+      if (addressModalMode === 'create') {
+        // Add new address
+        updatedAddresses = [...(selectedPerson.addresses || []), addressData];
+      } else {
+        // Update existing address
+        updatedAddresses = (selectedPerson.addresses || []).map(a => 
+          a.id === addressData.id ? addressData : a
+        );
+      }
+
+      // Optimistic update for selectedPerson
+      const updatedPerson = { ...selectedPerson, addresses: updatedAddresses };
+      setSelectedPerson(updatedPerson);
+
+      // Optimistic update for allPersons list
+      setAllPersons(prevPersons => 
+        prevPersons.map(p => p.id === selectedPerson.id ? updatedPerson : p)
+      );
+    }
+  };
+
   const TabConfig: Tab[]=[
     {
       label: 'Datos Personales',
-      content: <TabPersonData person={selectedPerson} onEditClick={handleOpenEditModal} onAddPhoneClick={handleOpenAddPhoneModal} onEditPhoneClick={handleOpenEditPhoneModal} />
+      content: <TabPersonData 
+        person={selectedPerson} 
+        onEditClick={handleOpenEditModal} 
+        onAddPhoneClick={handleOpenAddPhoneModal} 
+        onEditPhoneClick={handleOpenEditPhoneModal}
+        onAddAddressClick={handleOpenAddAddressModal}
+        onEditAddressClick={handleOpenEditAddressModal}
+      />
     },
     {
       label: 'Membresía',
@@ -259,6 +322,21 @@ export default function PeoplePage() {
             personId={selectedPerson.id}
             onFormSubmit={handlePhoneFormSuccess}
             phoneToEdit={phoneToEdit}
+          />
+        </Modal>
+      )}
+
+      {selectedPerson && (
+        <Modal
+          isOpen={isAddressModalOpen}
+          onClose={handleCloseAddressModal}
+          title={addressModalMode === 'edit' ? `Editar Dirección de ${selectedPerson.name}` : `Añadir Dirección a ${selectedPerson.name}`}
+        >
+          <AddAddressForm
+            key={addressFormKey}
+            personId={selectedPerson.id}
+            onFormSubmit={handleAddressFormSuccess}
+            addressToEdit={addressToEdit}
           />
         </Modal>
       )}

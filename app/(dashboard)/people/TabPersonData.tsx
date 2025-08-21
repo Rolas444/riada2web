@@ -8,9 +8,11 @@ interface TabPersonDataProps {
     onEditClick: (person: Person) => void;
     onAddPhoneClick: () => void;
     onEditPhoneClick: (phone: PhoneType) => void;
+    onAddAddressClick: () => void;
+    onEditAddressClick: (address: any) => void;
 }
 
-export const TabPersonData = ({ person, onEditClick, onAddPhoneClick, onEditPhoneClick }: TabPersonDataProps) => {
+export const TabPersonData = ({ person, onEditClick, onAddPhoneClick, onEditPhoneClick, onAddAddressClick, onEditAddressClick }: TabPersonDataProps) => {
     if (!person) {
         return (
             <div className="p-4 text-center text-gray-500">
@@ -75,14 +77,32 @@ export const TabPersonData = ({ person, onEditClick, onAddPhoneClick, onEditPhon
                     )}
                 </div>
                 <div>
-                    <h4 className="text-md font-semibold mb-2 flex items-center">
-                        <MapPin size={16} className="mr-2" />
-                        Direcciones
-                    </h4>
+                    <div className="flex justify-between items-center mb-2">
+                        <h4 className="text-md font-semibold flex items-center">
+                            <MapPin size={16} className="mr-2" />
+                            Direcciones
+                        </h4>
+                        <button 
+                            onClick={onAddAddressClick}
+                            className="p-1.5 text-gray-500 rounded-md hover:cursor-pointer hover:bg-gray-100 hover:text-green-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-green-400 transition-colors"
+                            aria-label={`Añadir dirección a ${person.name}`}
+                        >
+                            <Plus size={18} />
+                        </button>
+                    </div>
                     {person.addresses && person.addresses.length > 0 ? (
-                        <ul className="list-disc list-inside space-y-1 text-sm pl-2">
+                        <ul className="space-y-1 text-sm">
                             {person.addresses.map(address => (
-                                <li key={address.id}>{`${address.address}`}</li>
+                                <li key={address.id} className="flex justify-between items-center group">
+                                    <span className="transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400">{address.address}</span>
+                                    <button
+                                        onClick={() => onEditAddressClick(address)}
+                                        className="p-1 text-gray-400 hover:cursor-pointer rounded-md hover:bg-gray-200 hover:text-blue-600 dark:hover:bg-gray-700 dark:hover:text-blue-400 transition-colors opacity-0 group-hover:opacity-100"
+                                        aria-label={`Editar dirección ${address.address}`}
+                                    >
+                                        <Edit size={14} />
+                                    </button>
+                                </li>
                             ))}
                         </ul>
                     ) : (

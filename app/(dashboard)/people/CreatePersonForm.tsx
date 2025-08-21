@@ -6,7 +6,7 @@ import { CreatePerson, updatePerson } from "@/features/persons/api/personApi";
 import { capitalizeWords } from "@/lib/textUtils";
 import { PersonFormConfig } from "@/features/persons/config/personFormConfig";
 import { Person } from "@/core/domain/person";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface CreatePersonFormProps {
     onFormSubmit?: () => void;
@@ -15,49 +15,42 @@ interface CreatePersonFormProps {
 
 export const CreatePersonForm: React.FC<CreatePersonFormProps> = ({ onFormSubmit, personToEdit }) => {
     const token = useAuthStore((state) => state.token);
+    const [isLoading, setIsLoading] = useState(false);
     
-  const handleSubmit = (data: PersonRequest) => {
+  const handleSubmit = async (data: PersonRequest) => {
     if (!token) {
       toast.error('No estás autenticado. Por favor, inicia sesión de nuevo.');
       return;
     }
-    // console.log('Datos del formulario:', data);
-    // Capitaliza y limpia los campos antes de enviar
-    const payload = {
-      ...data,
-      name: capitalizeWords(data.name),
-      middleName: capitalizeWords(data.middleName),
-      lastName: capitalizeWords(data.lastName),
-    };
-    if (payload.docNumber === '') delete (payload as Partial<PersonRequest>).docNumber;
-    if (payload.email === '') delete (payload as Partial<PersonRequest>).email;
-    if (payload.birthday === '') delete (payload as Partial<PersonRequest>).birthday;
-    // if (payload.typeDoc === '') delete (payload as Partial<PersonRequest>).typeDoc;
 
-    if (personToEdit) {
-      // Modo Edición
-      toast.promise(updatePerson(personToEdit.id, payload, token), {
-        loading: 'Actualizando persona...',
-        success: (result) => {
-          onFormSubmit?.();
-          return result.message || 'Persona actualizada correctamente';
-        },
-        error: (error: any) => {
-          return error.message || 'Ocurrió un error al actualizar.';
-        },
-      });
-    } else {
-      // Modo Creación
-      toast.promise(CreatePerson(payload, token), {
-        loading: 'Creando persona...',
-        success: (result) => {
-          onFormSubmit?.();
-          return result.message || 'Persona creada correctamente';
-        },
-        error: (error: any) => {
-          return error.message || 'Ocurrió un error inesperado.';
-        },
-      });
+    setIsLoading(true);
+    try {
+      // Capitaliza y limpia los campos antes de enviar
+      const payload = {
+        ...data,
+        name: capitalizeWords(data.name),
+        middleName: capitalizeWords(data.middleName),
+        lastName: capitalizeWords(data.lastName),
+      };
+      if (payload.docNumber === '') delete (payload as Partial<PersonRequest>).docNumber;
+      if (payload.email === '') delete (payload as Partial<PersonRequest>).email;
+      if (payload.birthday === '') delete (payload as Partial<PersonRequest>).birthday;
+
+      if (personToEdit) {
+        // Modo Edición
+        const result = await updatePerson(personToEdit.id, payload, token);
+        onFormSubmit?.();
+        toast.success(result.message || 'Persona actualizada correctamente');
+      } else {
+        // Modo Creación
+        const result = await CreatePerson(payload, token);
+        onFormSubmit?.();
+        toast.success(result.message || 'Persona creada correctamente');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Ocurrió un error inesperado.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -82,6 +75,7 @@ export const CreatePersonForm: React.FC<CreatePersonFormProps> = ({ onFormSubmit
       onSubmit={handleSubmit}
       submitButtonText={personToEdit ? "Actualizar" : "Guardar"}
       defaultValues={defaultValues}
+      isLoading={isLoading}
     />
   );
 

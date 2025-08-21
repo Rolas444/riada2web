@@ -23,6 +23,7 @@ interface ReusableFormProps<T extends FieldValues> {
   onSubmit: SubmitHandler<T>;
   defaultValues?: DefaultValues<T>;
   submitButtonText?: string;
+  isLoading?: boolean;
 }
 
 const ReusableForm = <T extends FieldValues>({
@@ -30,6 +31,7 @@ const ReusableForm = <T extends FieldValues>({
   onSubmit,
   defaultValues,
   submitButtonText = 'Guardar Cambios',
+  isLoading = false,
 }: ReusableFormProps<T>) => {
   const {
     control,
@@ -97,8 +99,8 @@ const ReusableForm = <T extends FieldValues>({
           )}
         </div>
       ))}
-      <Button type='submit'>
-        {submitButtonText}
+      <Button type='submit' disabled={isLoading}>
+        {isLoading ? 'Guardando...' : submitButtonText}
       </Button>
     </form>
   );

@@ -5,6 +5,7 @@ import { useAuthStore } from "@/features/auth/store/authStore";
 import { toast } from "sonner";
 import { addPhoneToPerson, updatePhoneToPerson } from "@/features/persons/api/personApi";
 import { Phone } from "@/core/domain/phone";
+import { useState } from "react";
 
 interface AddPhoneFormProps {
     personId: string;
@@ -15,6 +16,7 @@ interface AddPhoneFormProps {
 const AddPhoneForm: React.FC<AddPhoneFormProps> = ({ personId, onFormSubmit, phoneToEdit }) => {
     const token = useAuthStore((state) => state.token);
     const isEditMode = !!phoneToEdit;
+    const [isLoading, setIsLoading] = useState(false);
 
     const phoneFormConfig: FieldConfig<any>[] = [
         {
@@ -30,36 +32,29 @@ const AddPhoneForm: React.FC<AddPhoneFormProps> = ({ personId, onFormSubmit, pho
         }
     ];
 
-    const handleSubmit = (data: { phone: string }) => {
+    const handleSubmit = async (data: { phone: string }) => {
         if (!token) {
             toast.error('No estás autenticado.');
             return;
         }
 
-        if (isEditMode) {
-            console.log('Editing phone:', phoneToEdit);
-            const updatedPhone = { ...phoneToEdit, phone: data.phone };
-            toast.promise(updatePhoneToPerson(token, updatedPhone), {
-                loading: 'Actualizando teléfono...',
-                success: (result) => {
-                    onFormSubmit?.(result.data);
-                    return result.message || 'Teléfono actualizado correctamente.';
-                },
-                error: (error: any) => {
-                    return error.message || 'Ocurrió un error al actualizar el teléfono.';
-                }
-            });
-        } else {
-            toast.promise(addPhoneToPerson(token, personId, data.phone), {
-                loading: 'Agregando teléfono...',
-                success: (result) => {
-                    onFormSubmit?.(result.data);
-                    return result.message || 'Teléfono agregado correctamente.';
-                },
-                error: (error: any) => {
-                    return error.message || 'Ocurrió un error al agregar el teléfono.';
-                }
-            });
+        setIsLoading(true);
+        try {
+            if (isEditMode) {
+                console.log('Editing phone:', phoneToEdit);
+                const updatedPhone = { ...phoneToEdit, phone: data.phone };
+                const result = await updatePhoneToPerson(token, updatedPhone);
+                onFormSubmit?.(result.data);
+                toast.success(result.message || 'Teléfono actualizado correctamente.');
+            } else {
+                const result = await addPhoneToPerson(token, personId, data.phone);
+                onFormSubmit?.(result.data);
+                toast.success(result.message || 'Teléfono agregado correctamente.');
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'Ocurrió un error al procesar la solicitud.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -71,6 +66,7 @@ const AddPhoneForm: React.FC<AddPhoneFormProps> = ({ personId, onFormSubmit, pho
             onSubmit={handleSubmit}
             submitButtonText={isEditMode ? "Actualizar Teléfono" : "Agregar Teléfono"}
             defaultValues={defaultValues}
+            isLoading={isLoading}
         />
     );
 };

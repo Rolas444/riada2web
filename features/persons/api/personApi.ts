@@ -153,7 +153,7 @@ export const addAddressToPerson = async (
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001/api/v1";
 
-  const response = await fetch(`${apiUrl}/protected/phone`, {
+  const response = await fetch(`${apiUrl}/protected/address`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -164,7 +164,7 @@ export const addAddressToPerson = async (
   const result = await response.json();
 
   if (!response.ok) {
-    throw new Error(result.error || "Ocurrió un error al agregar el teléfono.");
+    throw new Error(result.error || "Ocurrió un error al agregar la dirección.");
   }
 
   return result as AddAddressResponse;
@@ -177,7 +177,7 @@ export const updateAddressToPerson = async (
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001/api/v1";
 
-  const response = await fetch(`${apiUrl}/protected/phone`, {
+  const response = await fetch(`${apiUrl}/protected/address`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -188,7 +188,7 @@ export const updateAddressToPerson = async (
   const result = await response.json();
 
   if (!response.ok) {
-    throw new Error(result.error || "Ocurrió un error al agregar el teléfono.");
+    throw new Error(result.error || "Ocurrió un error al actualizar la dirección.");
   }
 
   return result as AddAddressResponse;
