@@ -1,4 +1,5 @@
 import { Address } from "./address";
+import { Membership } from "./membership";
 import { Phone } from "./phone";
 
 /**
@@ -27,4 +28,5 @@ export interface Person {
   photo?: string;
   addresses: Address[]; // Array de IDs de direcciones
   phones: Phone[]; // Array de IDs de teléfonos
+  membership?: Membership; 
 }

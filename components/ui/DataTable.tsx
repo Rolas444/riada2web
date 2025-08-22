@@ -30,6 +30,9 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   filterColumn?: string;
   filterPlaceholder?: string;
+  loading?: boolean;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -37,6 +40,9 @@ export function DataTable<TData, TValue>({
   data,
   filterColumn,
   filterPlaceholder,
+  loading = false,
+  searchQuery,
+  onSearchChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] =
@@ -64,9 +70,60 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  // Renderizar contenido de loading
+  if (loading) {
+    return (
+      <div className="w-full">
+        <div className="rounded-md border dark:border-gray-700">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                    <span className="text-gray-500">Cargando datos...</span>
+                  </div>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full">
-      {filterColumn && (
+      {/* Búsqueda personalizada si se proporciona */}
+      {onSearchChange && (
+        <div className="flex items-center py-4">
+          <Input
+            placeholder={filterPlaceholder || "Buscar..."}
+            value={searchQuery || ''}
+            onChange={(event) => onSearchChange(event.target.value)}
+            className="max-w-sm"
+          />
+        </div>
+      )}
+      
+      {/* Filtro por columna específica si se proporciona */}
+      {filterColumn && !onSearchChange && (
         <div className="flex items-center py-4">
           <Input
             placeholder={filterPlaceholder || `Filtrar por ${filterColumn}...`}
@@ -80,6 +137,7 @@ export function DataTable<TData, TValue>({
           />
         </div>
       )}
+      
       <div className="rounded-md border dark:border-gray-700">
         <Table>
           <TableHeader>
@@ -123,7 +181,7 @@ export function DataTable<TData, TValue>({
         <Button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
           Anterior
         </Button>
-        <Button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+        <Button onClick={() => table.nextPage()} disabled={!table.getCanPreviousPage()}>
           Siguiente
         </Button>
       </div>
