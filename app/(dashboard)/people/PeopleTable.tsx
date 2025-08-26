@@ -1,4 +1,5 @@
 import React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Person } from "@/core/domain/person";
 import { CalculateAge } from "@/lib/utils";
 
@@ -14,11 +15,28 @@ interface PeopleTableProps {
 const PeopleTable: React.FC<PeopleTableProps> = ({ persons: people, onRowClick, selectedPersonId }) => {
   const columnsCount = 6;
 
-  
+  const pageSize = 8;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = useMemo(() => {
+    return Math.max(1, Math.ceil((people?.length ?? 0) / pageSize));
+  }, [people]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(1);
+    }
+  }, [people, totalPages, currentPage]);
+
+  const pagedPeople = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return people.slice(startIndex, startIndex + pageSize);
+  }, [people, currentPage]);
 
   return (
-    <div className="overflow-auto max-h-[450px] rounded-lg border border-gray-200 dark:border-gray-700">
-      <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm dark:divide-gray-700 dark:bg-gray-800">
+    <div className="rounded-lg border border-gray-200 dark:border-gray-700">
+      <div className="overflow-auto max-h-[450px] rounded-t-lg">
+        <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm dark:divide-gray-700 dark:bg-gray-800">
         <thead className="sticky top-0 bg-gray-50 dark:bg-gray-700/80">
           <tr>
             <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900 dark:text-white">
@@ -42,8 +60,8 @@ const PeopleTable: React.FC<PeopleTableProps> = ({ persons: people, onRowClick, 
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-          {people.length > 0 ? (
-            people.map((person) => (
+          {pagedPeople.length > 0 ? (
+            pagedPeople.map((person) => (
               <tr 
                 key={person.id}
                 onClick={() => onRowClick(person)}
@@ -67,7 +85,40 @@ const PeopleTable: React.FC<PeopleTableProps> = ({ persons: people, onRowClick, 
             </tr>
           )}
         </tbody>
-      </table>
+        </table>
+      </div>
+      <div className="flex items-center justify-between gap-2 px-3 py-2 border-t border-gray-200 dark:border-gray-700">
+        <p className="text-xs text-gray-600 dark:text-gray-300">
+          {people.length > 0 ? (
+            (() => {
+              const start = (currentPage - 1) * pageSize + 1;
+              const end = Math.min(currentPage * pageSize, people.length);
+              return `Mostrando ${start}-${end} de ${people.length}`;
+            })()
+          ) : 'Sin resultados'}
+        </p>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            className="px-2 py-1 text-xs rounded border border-gray-300 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:text-gray-200"
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+          >
+            Anterior
+          </button>
+          <span className="text-xs text-gray-600 dark:text-gray-300 px-2">
+            {currentPage} / {totalPages}
+          </span>
+          <button
+            type="button"
+            className="px-2 py-1 text-xs rounded border border-gray-300 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:text-gray-200"
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Siguiente
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

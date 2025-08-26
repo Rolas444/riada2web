@@ -1,15 +1,14 @@
 
-export type MembershipStatus = "A" | "I" | "O" |"S";
+export type MembershipState = "A" | "I" ;
 
 export interface Membership {
   id?: string;
   personId: string;
   startedAt?: string; //YYYY-MM-DD
-  state: MembershipStatus;
+  state: MembershipState;
   membershipSigned: boolean;
-  status: string;
   transferred: boolean;
   nameLastChurch?: string;
-  Baptized?: boolean;
+  baptized?: boolean;
   baptismDate?: string; //YYYY-MM-DD
 }

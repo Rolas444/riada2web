@@ -9,22 +9,38 @@ import { toast } from 'sonner';
 
 interface TabMembershipDataProps {
     person: Person | null;
+    onMembershipUpdate?: (membership: Membership) => void;
 }
 
-export const TabMembershipData = ({ person }: TabMembershipDataProps) => {
+export const TabMembershipData = ({ person, onMembershipUpdate }: TabMembershipDataProps) => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [membershipFormKey, setMembershipFormKey] = useState(0);
     const { createMembership, loading, error } = useMembership();
 
     // Usar directamente el membership de la persona seleccionada
     const membership = person?.membership || null;
 
-    const handleCreateSuccess = () => {
+    const handleCreateSuccess = (newMembership: Membership) => {
         setIsCreateModalOpen(false);
-        // Recargar la página o actualizar el estado de la persona
-        // Esto dependerá de cómo se maneje el estado en el componente padre
+        setMembershipFormKey(prevKey => prevKey + 1); // Reset form key
         toast.success('Membership creado exitosamente');
-        // Opcional: recargar la página para mostrar el nuevo membership
-        window.location.reload();
+        if (onMembershipUpdate) {
+            onMembershipUpdate(newMembership);
+        }
+    };
+
+    const handleEditSuccess = (updatedMembership: Membership) => {
+        setIsEditModalOpen(false);
+        toast.success('Membership actualizado exitosamente');
+        if (onMembershipUpdate) {
+            onMembershipUpdate(updatedMembership);
+        }
+    };
+
+    const handleOpenCreateModal = () => {
+        setIsCreateModalOpen(true);
+        setMembershipFormKey(prevKey => prevKey + 1); // Reset form key
     };
 
     if (!person) {
@@ -39,11 +55,17 @@ export const TabMembershipData = ({ person }: TabMembershipDataProps) => {
         <div className="p-4 dark:text-gray-300">
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Membresía de {person.name}</h3>
-                {!membership && (
+                {!membership ? (
                     <Button
-                        onClick={() => setIsCreateModalOpen(true)}
+                        onClick={handleOpenCreateModal}
                     >
                         Crear Membership
+                    </Button>
+                ) : (
+                    <Button
+                        onClick={() => setIsEditModalOpen(true)}
+                    >
+                        Editar Membership
                     </Button>
                 )}
             </div>
@@ -76,15 +98,10 @@ export const TabMembershipData = ({ person }: TabMembershipDataProps) => {
                                  membership.state === 'O' ? 'Otro' : 'Suspendido'}
                             </p>
                         </div>
+                        
                         <div>
                             <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                Status
-                            </label>
-                            <p className="text-sm">{membership.status}</p>
-                        </div>
-                        <div>
-                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                Fecha de Inicio
+                                Fecha de Alta
                             </label>
                             <p className="text-sm">
                                 {membership.startedAt ? new Date(membership.startedAt).toLocaleDateString() : 'No especificada'}
@@ -95,7 +112,7 @@ export const TabMembershipData = ({ person }: TabMembershipDataProps) => {
                                 Bautizado
                             </label>
                             <p className="text-sm">
-                                {membership.Baptized ? 'Sí' : 'No'}
+                                {membership.baptized ? 'Sí' : 'No'}
                             </p>
                         </div>
                     </div>
@@ -106,7 +123,7 @@ export const TabMembershipData = ({ person }: TabMembershipDataProps) => {
                                 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                                 : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                         }`}>
-                            {membership.membershipSigned ? 'Firmado' : 'No Firmado'}
+                            {membership.membershipSigned ? 'firmó membresía' : 'no firmó membresía'}
                         </span>
                         <span className={`px-2 py-1 text-xs rounded-full ${
                             membership.transferred
@@ -146,9 +163,24 @@ export const TabMembershipData = ({ person }: TabMembershipDataProps) => {
                 title={`Crear Membership para ${person.name}`}
             >
                 <CreateMembershipForm
+                    key={membershipFormKey}
                     personId={person.id}
                     onSuccess={handleCreateSuccess}
                     onCancel={() => setIsCreateModalOpen(false)}
+                />
+            </Modal>
+
+            {/* Modal para editar membership */}
+            <Modal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                title={`Editar Membership de ${person.name}`}
+            >
+                <CreateMembershipForm
+                    personId={person.id}
+                    membershipToEdit={membership}
+                    onSuccess={handleEditSuccess}
+                    onCancel={() => setIsEditModalOpen(false)}
                 />
             </Modal>
         </div>

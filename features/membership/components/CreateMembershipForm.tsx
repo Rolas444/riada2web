@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useMembership } from '../hooks/useMembership';
 import { CreateMembershipRequest } from '../types/membershipTypes';
-import { MembershipStatus } from '@/core/domain/membership';
+import { Membership, MembershipState } from '@/core/domain/membership';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
@@ -11,26 +11,34 @@ import { toast } from 'sonner';
 
 interface CreateMembershipFormProps {
   personId?: string;
-  onSuccess?: () => void;
+  membershipToEdit?: Membership | null;
+  onSuccess?: (membership: Membership) => void;
   onCancel?: () => void;
 }
 
 export const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
   personId,
+  membershipToEdit,
   onSuccess,
   onCancel,
 }) => {
-  const { createMembership, loading, error } = useMembership();
+  const { createMembership, updateMembership, loading, error } = useMembership();
+  const isEditMode = !!membershipToEdit;
+  
   const [formData, setFormData] = useState<CreateMembershipRequest>({
+    id: membershipToEdit?.id, // Incluir el ID cuando se edita
     personId: personId || '',
-    startedAt: new Date().toISOString().split('T')[0], // Formato YYYY-MM-DD
-    state: 'A' as MembershipStatus, // Activo por defecto
-    membershipSigned: false,
-    status: 'Activo',
-    transferred: false,
-    nameLastChurch: '',
-    Baptized: false,
-    baptismDate: '',
+    startedAt: membershipToEdit?.startedAt 
+      ? new Date(membershipToEdit.startedAt).toISOString().split('T')[0]
+      : new Date().toISOString().split('T')[0],
+    state: (membershipToEdit?.state as MembershipState) || 'A',
+    membershipSigned: membershipToEdit?.membershipSigned || false,
+    transferred: membershipToEdit?.transferred || false,
+    nameLastChurch: membershipToEdit?.nameLastChurch || '',
+    Baptized: membershipToEdit?.baptized ?? true, // Usar 'baptized' del dominio
+    baptismDate: membershipToEdit?.baptismDate 
+      ? new Date(membershipToEdit.baptismDate).toISOString().split('T')[0]
+      : '',
   });
 
   // Efecto para manejar la lógica de nameLastChurch basada en transferred
@@ -42,6 +50,42 @@ export const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
       }));
     }
   }, [formData.transferred]);
+
+  // Efecto para reiniciar el formulario cuando se crea exitosamente
+  useEffect(() => {
+    if (!isEditMode && !loading && !error) {
+              setFormData({
+          personId: personId || '',
+        startedAt: new Date().toISOString().split('T')[0],
+        state: 'A' as MembershipState,
+        membershipSigned: false,
+        transferred: false,
+        nameLastChurch: '',
+        Baptized: true, // Mantener true por defecto
+        baptismDate: '',
+      });
+    }
+  }, [isEditMode, loading, error, personId]);
+
+  // Efecto para cargar datos existentes cuando se edita
+  useEffect(() => {
+    if (isEditMode && membershipToEdit) {
+      setFormData({
+        personId: personId || '', // Usar el personId de la persona seleccionada
+        startedAt: membershipToEdit.startedAt 
+          ? new Date(membershipToEdit.startedAt).toISOString().split('T')[0]
+          : new Date().toISOString().split('T')[0],
+        state: membershipToEdit.state,
+        membershipSigned: membershipToEdit.membershipSigned,
+        transferred: membershipToEdit.transferred,
+        nameLastChurch: membershipToEdit.nameLastChurch || '',
+        Baptized: membershipToEdit.baptized ?? true, // Usar 'baptized' del dominio
+        baptismDate: membershipToEdit.baptismDate 
+          ? new Date(membershipToEdit.baptismDate).toISOString().split('T')[0]
+          : '',
+      });
+    }
+  }, [isEditMode, membershipToEdit, personId]);
 
   const handleInputChange = (field: keyof CreateMembershipRequest, value: any) => {
     setFormData(prev => ({
@@ -59,20 +103,28 @@ export const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
     }
 
     try {
-      await createMembership(formData);
-      toast.success('Membership creado exitosamente');
-      onSuccess?.();
+      if (isEditMode && membershipToEdit?.id) {
+        const result = await updateMembership(membershipToEdit.id, formData);
+        if (result) {
+          toast.success('Membership actualizado exitosamente');
+          onSuccess?.(result);
+        }
+      } else {
+        const result = await createMembership(formData);
+        if (result) {
+          toast.success('Membership creado exitosamente');
+          onSuccess?.(result);
+        }
+      }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error al crear membership';
+      const errorMessage = err instanceof Error ? err.message : 'Error al procesar membership';
       toast.error(errorMessage);
     }
   };
 
-  const membershipStatusOptions = [
+  const membershipStateOptions = [
     { value: 'A', label: 'Activo' },
     { value: 'I', label: 'Inactivo' },
-    { value: 'O', label: 'Otro' },
-    { value: 'S', label: 'Suspendido' },
   ];
 
   return (
@@ -96,7 +148,7 @@ export const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Fecha de Inicio
+            Fecha de Alta
           </label>
           <Input
             type="date"
@@ -111,10 +163,10 @@ export const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
           </label>
           <Select
             value={formData.state}
-            onChange={(e) => handleInputChange('state', e.target.value as MembershipStatus)}
+            onChange={(e) => handleInputChange('state', e.target.value as MembershipState)}
             required
           >
-            {membershipStatusOptions.map(option => (
+            {membershipStateOptions.map(option => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -122,17 +174,6 @@ export const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
           </Select>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Status
-          </label>
-          <Input
-            type="text"
-            value={formData.status}
-            onChange={(e) => handleInputChange('status', e.target.value)}
-            placeholder="Ej: Activo, Pendiente, etc."
-          />
-        </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -175,7 +216,7 @@ export const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
               className="mr-2"
             />
             <span className="text-sm text-gray-700 dark:text-gray-300">
-              Membresía Firmada
+              firmó membresía
             </span>
           </label>
 
@@ -225,7 +266,7 @@ export const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
           type="submit"
           disabled={loading}
         >
-          {loading ? 'Creando...' : 'Crear Membership'}
+          {loading ? (isEditMode ? 'Actualizando...' : 'Creando...') : (isEditMode ? 'Actualizar Membership' : 'Crear Membership')}
         </Button>
       </div>
     </form>

@@ -20,18 +20,36 @@ export const createMembership = async (
 ): Promise<MembershipResponse> => {
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001/api/v1";
-
+  // Adaptar payload al contrato del backend
+  const requestBody = {
+    personID: Number(membershipData.personId),
+    startedAt: membershipData.startedAt
+      ? new Date(membershipData.startedAt).toISOString()
+      : null,
+    membershipSigned: membershipData.membershipSigned,
+    state: membershipData.state,
+    transferred: membershipData.transferred,
+    nameLastChurch:
+      typeof membershipData.nameLastChurch === 'string' && membershipData.nameLastChurch.trim() !== ''
+        ? membershipData.nameLastChurch
+        : null,
+    baptized: Boolean(membershipData.Baptized),
+    baptismDate: membershipData.baptismDate
+      ? new Date(membershipData.baptismDate).toISOString()
+      : null,
+  };
+  
   const response = await fetch(`${apiUrl}/protected/membership`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(membershipData),
+    body: JSON.stringify(requestBody),
   });
 
   const result = await response.json();
-
+  console.log("result", result);
   if (!response.ok) {
     throw new Error(result.error || "Ocurrió un error al crear el membership.");
   }
@@ -55,13 +73,36 @@ export const updateMembership = async (
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001/api/v1";
 
+  console.log("membershipData", membershipData);
+  console.log("membershipId", membershipId);
+  
+  // Adaptar payload al contrato del backend para actualizaciones
+  const requestBody = {
+    id: Number(membershipId),
+    personID: Number(membershipData.personId),
+    startedAt: membershipData.startedAt
+      ? new Date(membershipData.startedAt).toISOString()
+      : null,
+    membershipSigned: membershipData.membershipSigned,
+    state: membershipData.state,
+    transferred: membershipData.transferred,
+    nameLastChurch:
+      typeof membershipData.nameLastChurch === 'string' && membershipData.nameLastChurch.trim() !== ''
+        ? membershipData.nameLastChurch
+        : null,
+    baptized: Boolean(membershipData.Baptized),
+    baptismDate: membershipData.baptismDate
+      ? new Date(membershipData.baptismDate).toISOString()
+      : null,
+  };
+  
   const response = await fetch(`${apiUrl}/protected/membership`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ id: membershipId, ...membershipData }),
+    body: JSON.stringify(requestBody),
   });
 
   const result = await response.json();

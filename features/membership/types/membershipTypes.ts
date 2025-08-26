@@ -1,11 +1,11 @@
-import { Membership, MembershipStatus } from "@/core/domain/membership";
+import { Membership, MembershipState } from "@/core/domain/membership";
 
 export interface CreateMembershipRequest {
+  id?: string;
   personId: string;
   startedAt?: string; // YYYY-MM-DD
-  state: MembershipStatus;
+  state: MembershipState;
   membershipSigned: boolean;
-  status: string;
   transferred: boolean;
   nameLastChurch?: string;
   Baptized?: boolean;

@@ -230,6 +230,19 @@ export default function PeoplePage() {
     }
   };
 
+  const handleMembershipUpdate = (membershipData: any) => {
+    if (selectedPerson) {
+      // Optimistic update for selectedPerson
+      const updatedPerson = { ...selectedPerson, membership: membershipData };
+      setSelectedPerson(updatedPerson);
+
+      // Optimistic update for allPersons list
+      setAllPersons(prevPersons => 
+        prevPersons.map(p => p.id === selectedPerson.id ? updatedPerson : p)
+      );
+    }
+  };
+
   const TabConfig: Tab[]=[
     {
       label: 'Datos Personales',
@@ -238,13 +251,16 @@ export default function PeoplePage() {
         onEditClick={handleOpenEditModal} 
         onAddPhoneClick={handleOpenAddPhoneModal} 
         onEditPhoneClick={handleOpenEditPhoneModal}
-        onAddAddressClick={handleOpenAddAddressModal}
+        onAddAddressClick={handleOpenAddAddressModal} 
         onEditAddressClick={handleOpenEditAddressModal}
       />
     },
     {
       label: 'Membresía',
-      content: <TabMembershipData person={selectedPerson} />
+      content: <TabMembershipData 
+        person={selectedPerson} 
+        onMembershipUpdate={handleMembershipUpdate}
+      />
     }
   ]
 
