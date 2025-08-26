@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMembership } from '../hooks/useMembership';
 import { CreateMembershipRequest } from '../types/membershipTypes';
 import { MembershipStatus } from '@/core/domain/membership';
@@ -32,6 +32,16 @@ export const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
     Baptized: false,
     baptismDate: '',
   });
+
+  // Efecto para manejar la lógica de nameLastChurch basada en transferred
+  useEffect(() => {
+    if (!formData.transferred) {
+      setFormData(prev => ({
+        ...prev,
+        nameLastChurch: ''
+      }));
+    }
+  }, [formData.transferred]);
 
   const handleInputChange = (field: keyof CreateMembershipRequest, value: any) => {
     setFormData(prev => ({
@@ -68,19 +78,21 @@ export const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            ID de Persona *
-          </label>
-          <Input
-            type="text"
-            value={formData.personId}
-            onChange={(e) => handleInputChange('personId', e.target.value)}
-            placeholder="Ingrese el ID de la persona"
-            required
-            disabled={!!personId}
-          />
-        </div>
+        {/* Campo personId oculto - solo se muestra si no viene del contexto */}
+        {!personId && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              ID de Persona *
+            </label>
+            <Input
+              type="text"
+              value={formData.personId}
+              onChange={(e) => handleInputChange('personId', e.target.value)}
+              placeholder="Ingrese el ID de la persona"
+              required
+            />
+          </div>
+        )}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -131,7 +143,14 @@ export const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
             value={formData.nameLastChurch}
             onChange={(e) => handleInputChange('nameLastChurch', e.target.value)}
             placeholder="Nombre de la iglesia anterior"
+            disabled={!formData.transferred}
+            className={!formData.transferred ? 'bg-gray-100 cursor-not-allowed dark:bg-gray-700' : ''}
           />
+          {!formData.transferred && (
+            <p className="text-xs text-gray-500 mt-1">
+              Este campo se habilita cuando la persona es transferida
+            </p>
+          )}
         </div>
 
         <div>
@@ -196,7 +215,6 @@ export const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
         {onCancel && (
           <Button
             type="button"
-            // variant="outline"
             onClick={onCancel}
             disabled={loading}
           >
