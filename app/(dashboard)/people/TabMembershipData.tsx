@@ -87,39 +87,57 @@ export const TabMembershipData = ({ person, onMembershipUpdate }: TabMembershipD
                 </div>
             ) : (
                 <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div>
-                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    <div className="flex flex-wrap gap-x-6 gap-y-4">
+                        <div className="flex-1 min-w-[150px]">
+                            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">
                                 Estado
                             </label>
                             <p className="text-sm font-semibold">
-                                {membership.state === 'A' ? 'Activo' : 
-                                 membership.state === 'I' ? 'Inactivo' :
-                                 membership.state === 'O' ? 'Otro' : 'Suspendido'}
+                                {membership.state === 'A' ? 'Activo' :
+                                    membership.state === 'I' ? 'Inactivo' :
+                                        membership.state === 'O' ? 'Otro' : 'Suspendido'}
                             </p>
                         </div>
-                        
-                        <div>
-                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+
+                        <div className="flex-1 min-w-[150px]">
+                            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">
                                 Fecha de Alta
                             </label>
                             <p className="text-sm">
                                 {membership.startedAt ? new Date(membership.startedAt).toLocaleDateString() : 'No especificada'}
                             </p>
                         </div>
-                        <div>
-                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        <div className="flex-1 min-w-[150px]">
+                            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">
                                 Bautizado
                             </label>
                             <p className="text-sm">
                                 {membership.baptized ? 'Sí' : 'No'}
                             </p>
                         </div>
+                        {membership.baptismDate && (
+                            <div className="flex-1 min-w-[150px]">
+                                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    Fecha de Bautismo
+                                </label>
+                                <p className="text-sm">
+                                    {new Date(membership.baptismDate).toLocaleDateString()}
+                                </p>
+                            </div>
+                        )}
+                        {membership.nameLastChurch && (
+                            <div className="flex-1 min-w-[150px]">
+                                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    Última Iglesia
+                                </label>
+                                <p className="text-sm">{membership.nameLastChurch}</p>
+                            </div>
+                        )}
                     </div>
-                    
-                    <div className="mt-3 flex flex-wrap gap-2">
+
+                    <div className="mt-4 flex flex-wrap gap-2">
                         <span className={`px-2 py-1 text-xs rounded-full ${
-                            membership.membershipSigned 
+                            membership.membershipSigned
                                 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                                 : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                         }`}>
@@ -133,26 +151,6 @@ export const TabMembershipData = ({ person, onMembershipUpdate }: TabMembershipD
                             {membership.transferred ? 'Transferido' : 'No Transferido'}
                         </span>
                     </div>
-
-                    {membership.nameLastChurch && (
-                        <div className="mt-3">
-                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                Última Iglesia
-                            </label>
-                            <p className="text-sm">{membership.nameLastChurch}</p>
-                        </div>
-                    )}
-
-                    {membership.baptismDate && (
-                        <div className="mt-3">
-                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                Fecha de Bautismo
-                            </label>
-                            <p className="text-sm">
-                                {new Date(membership.baptismDate).toLocaleDateString()}
-                            </p>
-                        </div>
-                    )}
                 </div>
             )}
 
