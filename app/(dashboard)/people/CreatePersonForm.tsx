@@ -31,10 +31,16 @@ export const CreatePersonForm: React.FC<CreatePersonFormProps> = ({ onFormSubmit
         name: capitalizeWords(data.name),
         middleName: capitalizeWords(data.middleName),
         lastName: capitalizeWords(data.lastName),
+        childrenCount: data.childrenCount ? Number(data.childrenCount) : undefined,
       };
       if (payload.docNumber === '') delete (payload as Partial<PersonRequest>).docNumber;
       if (payload.email === '') delete (payload as Partial<PersonRequest>).email;
       if (payload.birthday === '') delete (payload as Partial<PersonRequest>).birthday;
+      if (!payload.civilStatus) delete (payload as Partial<PersonRequest>).civilStatus;
+      if (payload.childrenCount === undefined || payload.childrenCount === null) delete (payload as Partial<PersonRequest>).childrenCount;
+      
+      // Debug: Log the payload being sent
+      console.log('Payload being sent to backend:', payload);
 
       if (personToEdit) {
         // Modo Edición
@@ -63,6 +69,8 @@ export const CreatePersonForm: React.FC<CreatePersonFormProps> = ({ onFormSubmit
     birthday: personToEdit.birthday ? new Date(personToEdit.birthday).toISOString().split('T')[0] : '',
     typeDoc: personToEdit.typeDoc ?? undefined,
     docNumber: personToEdit.docNumber || '',
+    civilStatus: personToEdit.civilStatus ?? undefined,
+    childrenCount: personToEdit.childrenCount ?? 0,
     email: personToEdit.email || '',
   } : undefined;
 

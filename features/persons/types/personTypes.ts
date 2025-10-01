@@ -1,5 +1,5 @@
 import { Phone } from "@/core/domain/phone";
-import { DocType, Sex } from "@/core/domain/person";
+import { DocType, Sex, CivilStatus } from "@/core/domain/person";
 import { Address } from "@/core/domain/address";
 
 export interface PersonResponse {
@@ -28,6 +28,8 @@ export interface PersonRequest {
   birthday: string; // Se espera el formato "YYYY-MM-DD"
   docNumber?: string;
   typeDoc?: DocType;
+  civilStatus?: CivilStatus;
+  childrenCount?: number;
   photo?: string;
   email: string;
 }

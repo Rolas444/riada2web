@@ -33,8 +33,7 @@ export default function MembersPage() {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
-      (membership.personId && membership.personId.toLowerCase().includes(query)) ||
-      (membership.status && membership.status.toLowerCase().includes(query)) ||
+      (membership.personId && membership.personId.toLowerCase().includes(query)) || 
       (membership.state && membership.state.toLowerCase().includes(query)) ||
       (membership.id && membership.id.toLowerCase().includes(query))
     );

@@ -1,7 +1,21 @@
-import { Person } from "@/core/domain/person";
+import { Person, CivilStatus } from "@/core/domain/person";
 import { CalculateAge } from "@/lib/utils";
 import { Edit, MapPin, Phone, Plus } from "lucide-react";
 import { Phone as PhoneType } from "@/core/domain/phone";
+
+// Helper function to convert civil status code to readable text
+const getCivilStatusText = (status: CivilStatus): string => {
+  const statusMap: Record<CivilStatus, string> = {
+    'SOL': 'Soltero(a)',
+    'CAS': 'Casado(a)',
+    'DiV': 'Divorciado(a)',
+    'VIU': 'Viudo(a)',
+    'SEP': 'Separado(a)',
+    'CON': 'Conviviente',
+    'ULI': 'Unión Libre'
+  };
+  return statusMap[status] || 'N/A';
+};
 
 interface TabPersonDataProps {
     person: Person | null;
@@ -39,6 +53,8 @@ export const TabPersonData = ({ person, onEditClick, onAddPhoneClick, onEditPhon
                 <p><span className="font-semibold text-gray-600 dark:text-gray-400">Documento:</span> {person.typeDoc && person.docNumber ? `${person.typeDoc}: ${person.docNumber}` : 'N/A'}</p>
                 <p><span className="font-semibold text-gray-600 dark:text-gray-400">Nacimiento:</span> {person.birthday ? new Date(person.birthday).toLocaleDateString() : 'N/A'}</p>
                 <p><span className="font-semibold text-gray-600 dark:text-gray-400">Sexo:</span> {person.sex === 'M' ? 'Masculino' : 'Femenino'}</p>
+                <p><span className="font-semibold text-gray-600 dark:text-gray-400">Estado Civil:</span> {person.civilStatus ? getCivilStatusText(person.civilStatus) : 'N/A'}</p>
+                <p><span className="font-semibold text-gray-600 dark:text-gray-400">Número de Hijos:</span> {person.childrenCount ?? 0}</p>
                 <p><span className="font-semibold text-gray-600 dark:text-gray-400">Edad:</span> {CalculateAge(person.birthday)}</p>
             </div>
             {/* Sección de Contacto */}

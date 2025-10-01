@@ -13,6 +13,11 @@ export type Sex = "M" | "F" ;
 export type DocType = "DNI" | "Passport" | "CE";
 
 /**
+ * Define el estado civil de una persona.
+ */
+export type CivilStatus = "SOL" | "CAS" | "DiV" | "VIU" | "SEP" | "CON" | "ULI";
+
+/**
  * Representa la información personal de un individuo.
  */
 export interface Person {
@@ -25,6 +30,8 @@ export interface Person {
   birthday: string; // Se espera el formato "YYYY-MM-DD"
   docNumber?: string;
   typeDoc?: DocType;
+  civilStatus?: CivilStatus;
+  childrenCount?: number;
   photo?: string;
   addresses: Address[]; // Array de IDs de direcciones
   phones: Phone[]; // Array de IDs de teléfonos

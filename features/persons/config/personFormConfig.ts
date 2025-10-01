@@ -59,6 +59,33 @@ import { PersonRequest } from "../types/personTypes";
       placeholder: 'XXXX-XXXX-XXXX',
     },
     {
+      name: 'civilStatus',
+      label: 'Estado Civil',
+      type: 'select',
+      options: [
+        { value: '', label: 'Seleccione...' },
+        { value: 'SOL', label: 'Soltero(a)' },
+        { value: 'CAS', label: 'Casado(a)' },
+        { value: 'DiV', label: 'Divorciado(a)' },
+        { value: 'VIU', label: 'Viudo(a)' },
+        { value: 'SEP', label: 'Separado(a)' },
+        { value: 'CON', label: 'Conviviente' },
+        { value: 'ULI', label: 'Unión Libre' },
+      ],
+    },
+    {
+      name: 'childrenCount',
+      label: 'Número de Hijos',
+      type: 'number',
+      placeholder: '0',
+      validation: {
+        min: {
+          value: 0,
+          message: 'El número de hijos no puede ser negativo'
+        }
+      },
+    },
+    {
       name: 'email',
       label: 'Correo Electrónico',
       type: 'email',

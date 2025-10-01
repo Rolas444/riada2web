@@ -15,6 +15,9 @@ export const CreatePerson = async (
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001/api/v1";
 
+  // Debug: Log the data being sent
+  console.log('CreatePerson - Data being sent:', personData);
+
   const response = await fetch(`${apiUrl}/protected/person`, {
     method: "PUT",
     headers: {
@@ -25,6 +28,10 @@ export const CreatePerson = async (
   });
 
   const result = await response.json();
+
+  // Debug: Log the response
+  console.log('CreatePerson - Response status:', response.status);
+  console.log('CreatePerson - Response data:', result);
 
   if (!response.ok) {
     throw new Error(result.error || "Ocurrió un error al crear el registro.");
@@ -41,17 +48,33 @@ export const updatePerson = async (
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001/api/v1";
 
+  // Debug: Log the data being sent
+  console.log('updatePerson - Data being sent:', personData);
+  console.log('updatePerson - Person ID:', personId);
+
   //usa la misma dirección que de creación y el mismo médodo
+  const payloadWithId = {
+    ...personData,
+    id: personId
+  };
+  
+  console.log('updatePerson - Final payload with ID:', payloadWithId);
+  
+  // Try original endpoint with ID in payload
   const response = await fetch(`${apiUrl}/protected/person`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(personData),
+    body: JSON.stringify(payloadWithId),
   });
 
   const result = await response.json();
+
+  // Debug: Log the response
+  console.log('updatePerson - Response status:', response.status);
+  console.log('updatePerson - Response data:', result);
 
   if (!response.ok) {
     throw new Error(
