@@ -16,8 +16,8 @@ const Tabs: React.FC<TabsProps> = ({ tabs }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <div>
-      <div className="border-b  border-gray-200 dark:border-gray-700">
+    <div className="flex h-full flex-col">
+      <div className="shrink-0 border-b  border-gray-200 dark:border-gray-700">
         <nav className="-mb-px flex space-x-4" aria-label="Tabs">
           {tabs.map((tab, index) => (
             <button
@@ -36,7 +36,7 @@ const Tabs: React.FC<TabsProps> = ({ tabs }) => {
           ))}
         </nav>
       </div>
-      <div className="mt-4">{tabs[activeTab] && tabs[activeTab].content}</div>
+      <div className="mt-4 min-h-0 grow overflow-y-auto">{tabs[activeTab] && tabs[activeTab].content}</div>
     </div>
   );
 };

@@ -279,8 +279,8 @@ export default function PeoplePage() {
         <Button onClick={handleOpenCreateModal}>Nuevo</Button>
       </div>
 
-      {/* Panel de detalles con pestañas */}
-      <div className="mt-2 h-[35vh] overflow-y-auto rounded-lg bg-gray-50 p-1 dark:border dark:border-gray-700 dark:bg-gray-800">
+      {/* Panel de detalles con pestañas - el scroll se maneja dentro del contenido de Tabs */}
+      <div className="mt-2 h-[35vh] rounded-lg bg-gray-50 p-1 dark:border dark:border-gray-700 dark:bg-gray-800">
         <Tabs tabs={TabConfig} />
       </div>
 
