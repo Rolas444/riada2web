@@ -10,6 +10,7 @@ import {
   Users,
   Contact,
   Group,
+  File,
 } from 'lucide-react';
 import { useAuthStore } from '@/features/auth/store/authStore'; 
 import { Sidebar, NavItem } from '@/components/dashboard/Sidebar';
@@ -37,11 +38,15 @@ const navItems: NavItem[] = [
   },
   
   {
-    label: 'Miembros',
-    href: '/members',
+    label: 'Ministerios',
+    href: '/ministries',
     icon: <Group />,
   },
-  
+  {
+    label: 'Reportes',
+    href: '/reports',
+    icon: <File />,
+  },
   
   {
     label: 'Configuración',
