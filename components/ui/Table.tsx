@@ -48,7 +48,7 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={clsx(
-      'border-b transition-colors hover:bg-gray-100/50 data-[state=selected]:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800/50 dark:data-[state=selected]:bg-gray-800',
+      'border-b transition-colors hover:bg-gray-100/50 data-[state=selected]:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800/50 dark:data-[state=selected]:bg-gray-800 cursor-pointer',
       className
     )}
     {...props}
@@ -77,7 +77,10 @@ const TableCell = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <td
     ref={ref}
-    className={clsx('p-4 align-middle [&:has([role=checkbox])]:pr-0', className)}
+    className={clsx(
+      'p-4 align-middle text-gray-900 dark:text-gray-200 [&:has([role=checkbox])]:pr-0',
+      className
+    )}
     {...props}
   />
 ));

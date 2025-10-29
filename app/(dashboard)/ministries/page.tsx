@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useMinistry } from '@/features/ministry';
 import { Ministry, MinistryMember } from '@/core/domain/ministry';
 import { Button } from '@/components/ui/Button';
 import { DataTable } from '@/components/ui/DataTable';
 import Modal from '@/components/ui/Modal';
+import { Input } from '@/components/ui/Input';
 import { CreateMinistryForm } from '@/features/ministry/components/CreateMinistryForm';
 import { CreateMinistryMemberForm } from '@/features/ministry/components/CreateMinistryMemberForm';
 import { toast } from 'sonner';
@@ -34,6 +35,8 @@ export default function MinistriesPage() {
           getAllMinistries(),
           getAllMinistryMembers()
         ]);
+        console.log('ministriesData:', ministriesData);
+        console.log('membersData:', membersData);
         setMinistries(ministriesData);
         setMinistryMembers(membersData);
       } catch (err) {
@@ -45,26 +48,28 @@ export default function MinistriesPage() {
     fetchData();
   }, [getAllMinistries, getAllMinistryMembers]);
 
-  const filteredMinistries = ministries.filter(ministry => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      (ministry.name && ministry.name.toLowerCase().includes(query)) ||
-      (ministry.description && ministry.description.toLowerCase().includes(query)) ||
-      (ministry.mission && ministry.mission.toLowerCase().includes(query)) ||
-      (ministry.id && ministry.id.toLowerCase().includes(query))
+  const filteredMinistries = useMemo(() => {
+    if (!searchQuery) return ministries;
+    const lowercasedQuery = searchQuery.toLowerCase();
+    return ministries.filter(ministry => 
+      Object.values(ministry).some(value => 
+        String(value).toLowerCase().includes(lowercasedQuery)
+      )
     );
-  });
+  }, [searchQuery, ministries]);
 
-  const filteredMembers = ministryMembers.filter(member => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      (member.personId && member.personId.toLowerCase().includes(query)) ||
-      (member.role && member.role.toLowerCase().includes(query)) ||
-      (member.ministryId && member.ministryId.toLowerCase().includes(query))
+  const filteredMembers = useMemo(() => {
+    if (!searchQuery) return ministryMembers;
+    const lowercasedQuery = searchQuery.toLowerCase();
+    return ministryMembers.filter(member => 
+      Object.values(member).some(value => 
+        String(value).toLowerCase().includes(lowercasedQuery)
+      )
     );
-  });
+  }, [searchQuery, ministryMembers]);
+
+  const handleSearch = () => {
+  };
 
   const handleCreateSuccess = () => {
     setIsCreateModalOpen(false);
@@ -92,27 +97,38 @@ export default function MinistriesPage() {
   const ministryColumns = [
     {
       header: 'ID',
-      accessorKey: 'id',
+      accessorKey: 'ID',
     },
     {
       header: 'Nombre',
-      accessorKey: 'name',
+      accessorKey: 'Name',
+    },
+    
+    {
+      header: 'Descripción',
+      accessorKey: 'Description',
+      cell: ({ row }: any) => (
+        <span className="truncate max-w-xs">
+          {row.original.Description || '-'}
+        </span>
+      ),
+    },
+    
+    {
+      header: 'Misión',
+      accessorKey: 'Mission',
+      cell: ({ row }: any) => (
+        <span className="truncate max-w-xs">
+          {row.original.Mission || '-'}
+        </span>
+      ),
     },
     {
       header: 'Estado',
       accessorKey: 'status',
       cell: ({ row }: any) => (
-        <span className={row.original.status === 'A' ? 'text-green-600' : 'text-red-600'}>
-          {row.original.status === 'A' ? 'Activo' : 'Inactivo'}
-        </span>
-      ),
-    },
-    {
-      header: 'Descripción',
-      accessorKey: 'description',
-      cell: ({ row }: any) => (
-        <span className="truncate max-w-xs">
-          {row.original.description || '-'}
+        <span className={row.original.Status === 'A' ? 'text-green-600' : 'text-red-600'}>
+          {row.original.Status === 'A' ? 'Activo' : 'Inactivo'}
         </span>
       ),
     },
@@ -165,7 +181,7 @@ export default function MinistriesPage() {
   ];
 
   return (
-    <div className="p-6">
+    <div>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Gestión de Ministerios
@@ -203,6 +219,23 @@ export default function MinistriesPage() {
         </div>
       </div>
 
+      <div className="flex items-center py-4 space-x-2">
+        <Input
+          placeholder={
+            activeTab === 'ministries'
+              ? "Buscar por nombre, descripción, misión o ID..."
+              : "Buscar por ID de persona, rol o ID de ministerio..."
+          }
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="max-w-sm"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleSearch();
+          }}
+        />
+        <Button onClick={handleSearch}>Buscar</Button>
+      </div>
+
       <div className="flex justify-between items-center mb-4">
         <div className="flex space-x-3">
           {activeTab === 'ministries' && (
@@ -228,24 +261,18 @@ export default function MinistriesPage() {
         </div>
       )}
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+      <div className="mt-4">
         {activeTab === 'ministries' ? (
           <DataTable
             data={filteredMinistries}
             columns={ministryColumns}
             loading={loading}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            filterPlaceholder="Buscar por nombre, descripción, misión o ID..."
           />
         ) : (
           <DataTable
             data={filteredMembers}
             columns={memberColumns}
             loading={loading}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            filterPlaceholder="Buscar por ID de persona, rol o ID de ministerio..."
           />
         )}
       </div>

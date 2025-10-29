@@ -260,7 +260,7 @@ export const updateMinistryMember = async (
     status: memberData.status,
   };
   
-  const response = await fetch(`${apiUrl}/protected/ministry-member`, {
+  const response = await fetch(`${apiUrl}/protected/ministry/member`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -294,7 +294,7 @@ export const getMinistryMembersByMinistry = async (
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001/api/v1";
 
-  const response = await fetch(`${apiUrl}/protected/ministry-member/ministry/${ministryId}`, {
+  const response = await fetch(`${apiUrl}/protected/ministry/member/${ministryId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -325,7 +325,7 @@ export const getAllMinistryMembers = async (
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001/api/v1";
 
-  const response = await fetch(`${apiUrl}/protected/ministry-member`, {
+  const response = await fetch(`${apiUrl}/protected/ministry/member`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -360,7 +360,7 @@ export const deleteMinistryMember = async (
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001/api/v1";
 
-  const response = await fetch(`${apiUrl}/protected/ministry-member/${ministryId}/${personId}`, {
+  const response = await fetch(`${apiUrl}/protected/member/${ministryId}/${personId}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
