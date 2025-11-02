@@ -182,17 +182,25 @@ export default function MinistriesPage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          Gestión de Ministerios
-        </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Administra los ministerios y sus miembros del sistema.
-        </p>
+      {/* Header con título y botón - igual que people */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Gestión de Ministerios
+          </h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
+            Administra los ministerios y sus miembros del sistema.
+          </p>
+        </div>
+        {activeTab === 'ministries' ? (
+          <Button onClick={() => setIsCreateModalOpen(true)}>Nuevo</Button>
+        ) : (
+          <Button onClick={() => setIsAddMemberModalOpen(true)}>Nuevo</Button>
+        )}
       </div>
 
       {/* Tabs */}
-      <div className="mb-6">
+      <div className="mt-6 mb-4">
         <div className="border-b border-gray-200 dark:border-gray-700">
           <nav className="-mb-px flex space-x-8">
             <button
@@ -219,6 +227,7 @@ export default function MinistriesPage() {
         </div>
       </div>
 
+      {/* Búsqueda - igual que people */}
       <div className="flex items-center py-4 space-x-2">
         <Input
           placeholder={
@@ -236,32 +245,12 @@ export default function MinistriesPage() {
         <Button onClick={handleSearch}>Buscar</Button>
       </div>
 
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex space-x-3">
-          {activeTab === 'ministries' && (
-            <Button
-              onClick={() => setIsCreateModalOpen(true)}
-            >
-              Crear Ministerio
-            </Button>
-          )}
-          {activeTab === 'members' && (
-            <Button
-              onClick={() => setIsAddMemberModalOpen(true)}
-            >
-              Agregar Miembro
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {error && (
-        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded dark:bg-red-900 dark:border-red-800 dark:text-red-200">
-          {error}
-        </div>
-      )}
-
       <div className="mt-4">
+        {error && (
+          <p className="text-center text-red-500 dark:text-red-400 mb-4">
+            Error: {error}
+          </p>
+        )}
         {activeTab === 'ministries' ? (
           <DataTable
             data={filteredMinistries}
