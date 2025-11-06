@@ -219,7 +219,7 @@ export const createMinistryMember = async (
     status: memberData.status,
   };
   
-  const response = await fetch(`${apiUrl}/protected/ministry-member`, {
+  const response = await fetch(`${apiUrl}/protected/ministry/member`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -294,7 +294,7 @@ export const getMinistryMembersByMinistry = async (
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001/api/v1";
 
-  const response = await fetch(`${apiUrl}/protected/ministry/member/${ministryId}`, {
+  const response = await fetch(`${apiUrl}/protected/ministry/${ministryId}/members`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

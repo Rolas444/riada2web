@@ -2,10 +2,9 @@ import { Ministry, MinistryMember, MinistryStatus } from "@/core/domain/ministry
 
 // ===== MINISTRY TYPES =====
 export interface CreateMinistryRequest {
-  id?: string;
   name: string;
-  description?: string;
-  mission?: string;
+  description?: string | null;
+  mission?: string | null;
   status: MinistryStatus;
 }
 
@@ -27,15 +26,17 @@ export interface MinistriesResponse {
 
 // ===== MINISTRY MEMBER TYPES =====
 export interface CreateMinistryMemberRequest {
-  id?: string;
   ministryId: string;
   personId: string;
-  role?: string;
+  role?: string | null;
   status: MinistryStatus;
 }
 
-export interface UpdateMinistryMemberRequest extends Partial<CreateMinistryMemberRequest> {
-  id: string;
+export interface UpdateMinistryMemberRequest {
+  ministryId: string;
+  personId: string;
+  role?: string | null;
+  status: MinistryStatus;
 }
 
 export interface MinistryMemberResponse {

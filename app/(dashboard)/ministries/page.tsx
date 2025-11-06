@@ -82,6 +82,7 @@ export default function MinistriesPage() {
   };
 
   const handleViewMembers = async (ministry: Ministry) => {
+    console.log("handleViewMembers ministry", ministry);
     setSelectedMinistry(ministry);
     setActiveTab('members');
     try {
@@ -97,19 +98,19 @@ export default function MinistriesPage() {
   const ministryColumns = [
     {
       header: 'ID',
-      accessorKey: 'ID',
+      accessorKey: 'id',
     },
     {
       header: 'Nombre',
-      accessorKey: 'Name',
+      accessorKey: 'name',
     },
     
     {
       header: 'Descripción',
-      accessorKey: 'Description',
+      accessorKey: 'description',
       cell: ({ row }: any) => (
         <span className="truncate max-w-xs">
-          {row.original.Description || '-'}
+          {row.original.description || '-'}
         </span>
       ),
     },
@@ -119,7 +120,7 @@ export default function MinistriesPage() {
       accessorKey: 'Mission',
       cell: ({ row }: any) => (
         <span className="truncate max-w-xs">
-          {row.original.Mission || '-'}
+          {row.original.mission || '-'}
         </span>
       ),
     },
@@ -128,7 +129,7 @@ export default function MinistriesPage() {
       accessorKey: 'status',
       cell: ({ row }: any) => (
         <span className={row.original.Status === 'A' ? 'text-green-600' : 'text-red-600'}>
-          {row.original.Status === 'A' ? 'Activo' : 'Inactivo'}
+          {row.original.status === 'A' ? 'Activo' : 'Inactivo'}
         </span>
       ),
     },
