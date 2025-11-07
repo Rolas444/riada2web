@@ -2,6 +2,7 @@ import { Person, CivilStatus } from "@/core/domain/person";
 import { CalculateAge } from "@/lib/utils";
 import { Edit, MapPin, Phone, Plus } from "lucide-react";
 import { Phone as PhoneType } from "@/core/domain/phone";
+import { Address } from "@/core/domain/address";
 
 // Helper function to convert civil status code to readable text
 const getCivilStatusText = (status: CivilStatus): string => {
@@ -23,7 +24,7 @@ interface TabPersonDataProps {
     onAddPhoneClick: () => void;
     onEditPhoneClick: (phone: PhoneType) => void;
     onAddAddressClick: () => void;
-    onEditAddressClick: (address: any) => void;
+    onEditAddressClick: (address: Address) => void;
 }
 
 export const TabPersonData = ({ person, onEditClick, onAddPhoneClick, onEditPhoneClick, onAddAddressClick, onEditAddressClick }: TabPersonDataProps) => {

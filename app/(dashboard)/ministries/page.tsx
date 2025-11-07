@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/Input';
 import { CreateMinistryForm } from '@/features/ministry/components/CreateMinistryForm';
 import { CreateMinistryMemberForm } from '@/features/ministry/components/CreateMinistryMemberForm';
 import { toast } from 'sonner';
+import { Row } from '@tanstack/react-table';
 
 export default function MinistriesPage() {
   const [ministries, setMinistries] = useState<Ministry[]>([]);
@@ -17,7 +18,7 @@ export default function MinistriesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
-  const [selectedMinistry, setSelectedMinistry] = useState<Ministry | null>(null);
+  const [, setSelectedMinistry] = useState<Ministry | null>(null);
   const [activeTab, setActiveTab] = useState<'ministries' | 'members'>('ministries');
   
   const { 
@@ -86,11 +87,11 @@ export default function MinistriesPage() {
     setSelectedMinistry(ministry);
     setActiveTab('members');
     try {
-      const members = await getMinistryMembersByMinistry(ministry.id!);
+      const fetchedMembers = await getMinistryMembersByMinistry(ministry.id!);
       // Filtrar solo los miembros de este ministerio específico
-      const filteredMembers = ministryMembers.filter(member => member.ministryId === ministry.id);
+      const filteredMembers = fetchedMembers.filter(member => member.ministryId === ministry.id);
       setMinistryMembers(filteredMembers);
-    } catch (err) {
+    } catch {
       toast.error('Error al cargar miembros del ministerio');
     }
   };
@@ -108,7 +109,7 @@ export default function MinistriesPage() {
     {
       header: 'Descripción',
       accessorKey: 'description',
-      cell: ({ row }: any) => (
+      cell: ({ row }: { row: Row<Ministry> }) => (
         <span className="truncate max-w-xs">
           {row.original.description || '-'}
         </span>
@@ -118,7 +119,7 @@ export default function MinistriesPage() {
     {
       header: 'Misión',
       accessorKey: 'Mission',
-      cell: ({ row }: any) => (
+      cell: ({ row }: { row: Row<Ministry> }) => (
         <span className="truncate max-w-xs">
           {row.original.mission || '-'}
         </span>
@@ -127,8 +128,8 @@ export default function MinistriesPage() {
     {
       header: 'Estado',
       accessorKey: 'status',
-      cell: ({ row }: any) => (
-        <span className={row.original.Status === 'A' ? 'text-green-600' : 'text-red-600'}>
+      cell: ({ row }: { row: Row<Ministry> }) => (
+        <span className={row.original.status === 'A' ? 'text-green-600' : 'text-red-600'}>
           {row.original.status === 'A' ? 'Activo' : 'Inactivo'}
         </span>
       ),
@@ -136,7 +137,7 @@ export default function MinistriesPage() {
     {
       header: 'Acciones',
       accessorKey: 'actions',
-      cell: ({ row }: any) => (
+      cell: ({ row }: { row: Row<Ministry> }) => (
         <div className="flex space-x-2">
           <Button
             onClick={() => handleViewMembers(row.original)}
@@ -164,7 +165,7 @@ export default function MinistriesPage() {
     {
       header: 'Rol',
       accessorKey: 'role',
-      cell: ({ row }: any) => (
+      cell: ({ row }: { row: Row<MinistryMember> }) => (
         <span className="truncate max-w-xs">
           {row.original.role || '-'}
         </span>
@@ -173,7 +174,7 @@ export default function MinistriesPage() {
     {
       header: 'Estado',
       accessorKey: 'status',
-      cell: ({ row }: any) => (
+      cell: ({ row }: { row: Row<MinistryMember> }) => (
         <span className={row.original.status === 'A' ? 'text-green-600' : 'text-red-600'}>
           {row.original.status === 'A' ? 'Activo' : 'Inactivo'}
         </span>

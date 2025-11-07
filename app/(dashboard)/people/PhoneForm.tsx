@@ -18,7 +18,7 @@ const AddPhoneForm: React.FC<AddPhoneFormProps> = ({ personId, onFormSubmit, pho
     const isEditMode = !!phoneToEdit;
     const [isLoading, setIsLoading] = useState(false);
 
-    const phoneFormConfig: FieldConfig<any>[] = [
+    const phoneFormConfig: FieldConfig<{ phone: string }>[] = [
         {
             name: 'phone',
             label: 'Número de Teléfono',
@@ -51,8 +51,9 @@ const AddPhoneForm: React.FC<AddPhoneFormProps> = ({ personId, onFormSubmit, pho
                 onFormSubmit?.(result.data);
                 toast.success(result.message || 'Teléfono agregado correctamente.');
             }
-        } catch (error: any) {
-            toast.error(error.message || 'Ocurrió un error al procesar la solicitud.');
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Ocurrió un error al procesar la solicitud.';
+            toast.error(errorMessage);
         } finally {
             setIsLoading(false);
         }

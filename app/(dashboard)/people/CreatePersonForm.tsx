@@ -6,7 +6,7 @@ import { CreatePerson, updatePerson } from "@/features/persons/api/personApi";
 import { capitalizeWords } from "@/lib/textUtils";
 import { PersonFormConfig } from "@/features/persons/config/personFormConfig";
 import { Person } from "@/core/domain/person";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface CreatePersonFormProps {
     onFormSubmit?: () => void;
@@ -53,8 +53,9 @@ export const CreatePersonForm: React.FC<CreatePersonFormProps> = ({ onFormSubmit
         onFormSubmit?.();
         toast.success(result.message || 'Persona creada correctamente');
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Ocurrió un error inesperado.');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

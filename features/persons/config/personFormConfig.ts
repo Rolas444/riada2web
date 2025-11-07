@@ -76,12 +76,16 @@ import { PersonRequest } from "../types/personTypes";
     {
       name: 'childrenCount',
       label: 'Número de Hijos',
-      type: 'number',
+      type: 'text',
       placeholder: '0',
       validation: {
         min: {
           value: 0,
           message: 'El número de hijos no puede ser negativo'
+        },
+        pattern: {
+          value: /^\d+$/,
+          message: 'Debe ser un número válido'
         }
       },
     },

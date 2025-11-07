@@ -16,7 +16,7 @@ export const TabMembershipData = ({ person, onMembershipUpdate }: TabMembershipD
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [membershipFormKey, setMembershipFormKey] = useState(0);
-    const { createMembership, loading, error } = useMembership();
+    const { loading, error } = useMembership();
 
     // Usar directamente el membership de la persona seleccionada
     const membership = person?.membership || null;
@@ -83,7 +83,7 @@ export const TabMembershipData = ({ person, onMembershipUpdate }: TabMembershipD
             ) : !membership ? (
                 <div className="text-center py-8 text-gray-500">
                     <p>Esta persona no tiene una membresía registrada.</p>
-                    <p className="text-sm mt-2">Haga clic en "Crear Membership" para agregar una nueva.</p>
+                    <p className="text-sm mt-2">Haga clic en &quot;Crear Membership&quot; para agregar una nueva.</p>
                 </div>
             ) : (
                 <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">

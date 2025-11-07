@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import { Person} from "@/core/domain/person";
 import { Phone } from "@/core/domain/phone";
+import { Address } from "@/core/domain/address";
+import { Membership } from "@/core/domain/membership";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { getPersons } from "@/features/persons/api/personApi";
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -39,7 +41,7 @@ export default function PeoplePage() {
   // Estado para el modal de direcciones
   const [isAddressModalOpen, setAddressModalOpen] = useState(false);
   const [addressModalMode, setAddressModalMode] = useState<'create' | 'edit'>('create');
-  const [addressToEdit, setAddressToEdit] = useState<any>(null);
+  const [addressToEdit, setAddressToEdit] = useState<Address | null>(null);
   const [addressFormKey, setAddressFormKey] = useState(0);
 
 
@@ -191,7 +193,7 @@ export default function PeoplePage() {
     }
   };
 
-  const handleOpenEditAddressModal = (address: any) => {
+  const handleOpenEditAddressModal = (address: Address) => {
     if (selectedPerson) {
       setAddressModalMode('edit');
       setAddressToEdit(address);
@@ -204,10 +206,10 @@ export default function PeoplePage() {
     setAddressToEdit(null);
   };
 
-  const handleAddressFormSuccess = (addressData: any) => {
+  const handleAddressFormSuccess = (addressData: Address) => {
     handleCloseAddressModal();
     if (selectedPerson) {
-      let updatedAddresses: any[];
+      let updatedAddresses: Address[];
 
       if (addressModalMode === 'create') {
         // Add new address
@@ -230,7 +232,7 @@ export default function PeoplePage() {
     }
   };
 
-  const handleMembershipUpdate = (membershipData: any) => {
+  const handleMembershipUpdate = (membershipData: Membership) => {
     if (selectedPerson) {
       // Optimistic update for selectedPerson
       const updatedPerson = { ...selectedPerson, membership: membershipData };

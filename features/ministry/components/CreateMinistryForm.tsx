@@ -24,10 +24,9 @@ export const CreateMinistryForm: React.FC<CreateMinistryFormProps> = ({
   const isEditMode = !!ministryToEdit;
   
   const [formData, setFormData] = useState<CreateMinistryRequest>({
-    id: ministryToEdit?.id,
     name: ministryToEdit?.name || '',
-    description: ministryToEdit?.description || '',
-    mission: ministryToEdit?.mission || '',
+    description: ministryToEdit?.description || null,
+    mission: ministryToEdit?.mission || null,
     status: (ministryToEdit?.status as MinistryStatus) || 'A',
   });
 
@@ -35,10 +34,9 @@ export const CreateMinistryForm: React.FC<CreateMinistryFormProps> = ({
   useEffect(() => {
     if (isEditMode && ministryToEdit) {
       setFormData({
-        id: ministryToEdit.id,
         name: ministryToEdit.name,
-        description: ministryToEdit.description || '',
-        mission: ministryToEdit.mission || '',
+        description: ministryToEdit.description || null,
+        mission: ministryToEdit.mission || null,
         status: ministryToEdit.status,
       });
     }
@@ -105,8 +103,8 @@ export const CreateMinistryForm: React.FC<CreateMinistryFormProps> = ({
             Descripción
           </label>
           <textarea
-            value={formData.description}
-            onChange={(e) => handleInputChange('description', e.target.value)}
+            value={formData.description || ''}
+            onChange={(e) => handleInputChange('description', e.target.value || null)}
             placeholder="Descripción del ministerio"
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             rows={3}
@@ -118,8 +116,8 @@ export const CreateMinistryForm: React.FC<CreateMinistryFormProps> = ({
             Misión
           </label>
           <textarea
-            value={formData.mission}
-            onChange={(e) => handleInputChange('mission', e.target.value)}
+            value={formData.mission || ''}
+            onChange={(e) => handleInputChange('mission', e.target.value || null)}
             placeholder="Misión del ministerio"
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             rows={3}

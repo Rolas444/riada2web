@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useMinistry } from '../hooks/useMinistry';
-import { CreateMinistryMemberRequest } from '../types/ministryTypes';
+import { CreateMinistryMemberRequest, UpdateMinistryMemberRequest } from '../types/ministryTypes';
 import { MinistryMember, MinistryStatus } from '@/core/domain/ministry';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -26,10 +26,9 @@ export const CreateMinistryMemberForm: React.FC<CreateMinistryMemberFormProps> =
   const isEditMode = !!memberToEdit;
   
   const [formData, setFormData] = useState<CreateMinistryMemberRequest>({
-    id: memberToEdit?.id,
     ministryId: ministryId || memberToEdit?.ministryId || '',
     personId: memberToEdit?.personId || '',
-    role: memberToEdit?.role || '',
+    role: memberToEdit?.role || null,
     status: (memberToEdit?.status as MinistryStatus) || 'A',
   });
 
@@ -37,10 +36,9 @@ export const CreateMinistryMemberForm: React.FC<CreateMinistryMemberFormProps> =
   useEffect(() => {
     if (isEditMode && memberToEdit) {
       setFormData({
-        id: memberToEdit.id,
         ministryId: memberToEdit.ministryId,
         personId: memberToEdit.personId,
-        role: memberToEdit.role || '',
+        role: memberToEdit.role || null,
         status: memberToEdit.status,
       });
     }
@@ -67,8 +65,14 @@ export const CreateMinistryMemberForm: React.FC<CreateMinistryMemberFormProps> =
     }
 
     try {
-      if (isEditMode && memberToEdit?.id) {
-        const result = await updateMinistryMember(formData);
+      if (isEditMode && memberToEdit) {
+        const updateData: UpdateMinistryMemberRequest = {
+          ministryId: formData.ministryId,
+          personId: formData.personId,
+          role: formData.role || null,
+          status: formData.status,
+        };
+        const result = await updateMinistryMember(updateData);
         if (result) {
           toast.success('Miembro del ministerio actualizado exitosamente');
           onSuccess?.(result);
@@ -129,8 +133,8 @@ export const CreateMinistryMemberForm: React.FC<CreateMinistryMemberFormProps> =
           </label>
           <Input
             type="text"
-            value={formData.role}
-            onChange={(e) => handleInputChange('role', e.target.value)}
+            value={formData.role || ''}
+            onChange={(e) => handleInputChange('role', e.target.value || null)}
             placeholder="Rol en el ministerio (ej: Líder, Miembro, etc.)"
           />
         </div>

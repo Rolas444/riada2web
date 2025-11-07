@@ -1,11 +1,9 @@
 'use client';
 
-import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useThemeStore } from '@/features/theme/store/themeStore';
 
 export default function DashboardPage() {
-  const { logout } = useAuth();
-  const { toggleTheme, theme } = useThemeStore();
+  const { theme } = useThemeStore();
 
   return (
     <div className='text-black dark:text-white'>

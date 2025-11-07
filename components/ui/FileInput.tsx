@@ -3,8 +3,7 @@
 import * as React from 'react';
 import { clsx } from 'clsx';
 
-export interface FileInputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+export type FileInputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
   ({ className, ...props }, ref) => {

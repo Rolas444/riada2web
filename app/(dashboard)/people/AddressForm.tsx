@@ -19,7 +19,7 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ personId, onFormSubmit,
     const isEditMode = !!addressToEdit;
     const [isLoading, setIsLoading] = useState(false);
 
-    const addressFormConfig: FieldConfig<any>[] = [
+    const addressFormConfig: FieldConfig<{ address: string }>[] = [
         {
             name: 'address',
             label: 'Dirección',
@@ -52,8 +52,9 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ personId, onFormSubmit,
                 onFormSubmit?.(result.data);
                 toast.success(result.message || 'Dirección agregada correctamente.');
             }
-        } catch (error: any) {
-            toast.error(error.message || 'Ocurrió un error al procesar la solicitud.');
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Ocurrió un error al procesar la solicitud.';
+            toast.error(errorMessage);
         } finally {
             setIsLoading(false);
         }

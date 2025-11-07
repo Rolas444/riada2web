@@ -8,6 +8,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import  Modal  from '@/components/ui/Modal';
 import { CreateMembershipForm } from '@/features/membership/components/CreateMembershipForm';
 import { toast } from 'sonner';
+import { Row } from '@tanstack/react-table';
 
 export default function MembersPage() {
   const [memberships, setMemberships] = useState<Membership[]>([]);
@@ -65,7 +66,7 @@ export default function MembersPage() {
     {
       header: 'Firmado',
       accessorKey: 'membershipSigned',
-      cell: ({ row }: any) => (
+      cell: ({ row }: { row: Row<Membership> }) => (
         <span className={row.original.membershipSigned ? 'text-green-600' : 'text-red-600'}>
           {row.original.membershipSigned ? 'Sí' : 'No'}
         </span>
@@ -74,7 +75,7 @@ export default function MembersPage() {
     {
       header: 'Transferido',
       accessorKey: 'transferred',
-      cell: ({ row }: any) => (
+      cell: ({ row }: { row: Row<Membership> }) => (
         <span className={row.original.transferred ? 'text-green-600' : 'text-red-600'}>
           {row.original.transferred ? 'Sí' : 'No'}
         </span>
@@ -82,10 +83,10 @@ export default function MembersPage() {
     },
     {
       header: 'Bautizado',
-      accessorKey: 'Baptized',
-      cell: ({ row }: any) => (
-        <span className={row.original.Baptized ? 'text-green-600' : 'text-red-600'}>
-          {row.original.Baptized ? 'Sí' : 'No'}
+      accessorKey: 'baptized',
+      cell: ({ row }: { row: Row<Membership> }) => (
+        <span className={row.original.baptized ? 'text-green-600' : 'text-red-600'}>
+          {row.original.baptized ? 'Sí' : 'No'}
         </span>
       ),
     },

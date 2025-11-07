@@ -14,15 +14,6 @@ import {
   VisibilityState,
 } from '@tanstack/react-table';
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/Table';
-import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
 interface DataTableProps<TData, TValue> {
