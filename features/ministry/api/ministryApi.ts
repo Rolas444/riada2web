@@ -294,16 +294,19 @@ export const getMinistryMembersByMinistry = async (
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3001/api/v1";
 
-  const response = await fetch(`${apiUrl}/protected/ministry/${ministryId}/members`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await fetch(
+    `${apiUrl}/protected/ministry/member/${ministryId}/members`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
   const result = await response.json();
-
+console.log("getMinistryMembersByMinistry result", result);
   if (!response.ok) {
     throw new Error(
       result.error || "Ocurrió un error al obtener los miembros del ministerio."

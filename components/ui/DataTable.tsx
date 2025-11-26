@@ -69,10 +69,10 @@ export function DataTable<TData, TValue>({
   // Renderizar contenido de loading
   if (loading) {
     return (
-      <div className="w-full">
-        <div className="rounded-lg border border-gray-200 dark:border-gray-700">
-          <div className="overflow-auto max-h-[450px] rounded-t-lg">
-            <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm dark:divide-gray-700 dark:bg-gray-800">
+      <div className="w-full min-w-0">
+        <div className="rounded-lg border border-gray-200 dark:border-gray-700 min-w-0 overflow-hidden">
+          <div className="overflow-y-auto max-h-[450px] overflow-x-auto md:overflow-x-visible rounded-t-lg">
+            <table className="w-full table-auto divide-y-2 divide-gray-200 bg-white text-sm dark:divide-gray-700 dark:bg-gray-800">
               <thead className="sticky top-0 bg-gray-50 dark:bg-gray-700/80">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <tr key={headerGroup.id}>
@@ -113,7 +113,7 @@ export function DataTable<TData, TValue>({
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full min-w-0">
       {/* Búsqueda personalizada si se proporciona */}
       {onSearchChange && (
         <div className="flex items-center py-4">
@@ -143,16 +143,20 @@ export function DataTable<TData, TValue>({
       )}
       
       {/* Tabla con estilos iguales a PeopleTable */}
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700">
-        <div className="overflow-auto max-h-[450px] rounded-t-lg">
-          <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm dark:divide-gray-700 dark:bg-gray-800">
+      <div className="rounded-lg border border-gray-200 dark:border-gray-700 min-w-0 overflow-hidden">
+        <div className="overflow-y-auto max-h-[450px] overflow-x-auto md:overflow-x-visible rounded-t-lg">
+          <table className="w-full table-auto divide-y-2 divide-gray-200 bg-white text-sm dark:divide-gray-700 dark:bg-gray-800">
             <thead className="sticky top-0 bg-gray-50 dark:bg-gray-700/80">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
-                      className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900 dark:text-white"
+                      className="px-4 py-2 text-left font-medium text-gray-900 dark:text-white"
+                      style={{
+                        minWidth: (header.column.columnDef as any).size ? `${(header.column.columnDef as any).size}px` : 'auto',
+                        width: (header.column.columnDef as any).size ? `${(header.column.columnDef as any).size}px` : 'auto',
+                      }}
                     >
                       {header.isPlaceholder
                         ? null
@@ -175,7 +179,7 @@ export function DataTable<TData, TValue>({
                     {row.getVisibleCells().map((cell) => (
                       <td
                         key={cell.id}
-                        className="whitespace-nowrap px-4 py-2 text-gray-700 dark:text-gray-200"
+                        className="px-4 py-2 text-gray-700 dark:text-gray-200 align-top"
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>

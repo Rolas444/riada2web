@@ -24,9 +24,9 @@ const Header = ({ onToggleMobileSidebar }: { onToggleMobileSidebar: () => void }
 
 const DashboardContent: React.FC<DashboardContentProps> = ({ children, onToggleMobileSidebar }) => {
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col min-w-0">
       <Header onToggleMobileSidebar={onToggleMobileSidebar} />
-      <main className="flex-1 overflow-y-auto p-4 lg:p-8">{children}</main>
+      <main className="flex-1 overflow-y-auto p-4 lg:p-8 min-w-0">{children}</main>
     </div>
   );
 };

@@ -1,6 +1,47 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Estilos para scrollbar del Combobox */
+.combobox-dropdown {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(209 213 219) rgb(243 244 246);
+}
+
+.dark .combobox-dropdown {
+  scrollbar-color: rgb(75 85 99) rgb(31 41 55);
+}
+
+/* Estilos para navegadores WebKit (Chrome, Safari, Edge) */
+.combobox-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.combobox-dropdown::-webkit-scrollbar-track {
+  background: rgb(243 244 246);
+  border-radius: 4px;
+}
+
+.dark .combobox-dropdown::-webkit-scrollbar-track {
+  background: rgb(31 41 55);
+}
+
+.combobox-dropdown::-webkit-scrollbar-thumb {
+  background: rgb(209 213 219);
+  border-radius: 4px;
+}
+
+.dark .combobox-dropdown::-webkit-scrollbar-thumb {
+  background: rgb(75 85 99);
+}
+
+.combobox-dropdown::-webkit-scrollbar-thumb:hover {
+  background: rgb(156 163 175);
+}
+
+.dark .combobox-dropdown::-webkit-scrollbar-thumb:hover {
+  background: rgb(107 114 128);
+}
+
 /* :root {
   --background: #ffffff;
   --foreground: #171717;

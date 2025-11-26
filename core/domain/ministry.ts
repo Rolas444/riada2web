@@ -1,5 +1,7 @@
 export type MinistryStatus = "A" | "I"; // Activo, Inactivo
 
+import { Person } from "./person";
+
 export interface Ministry {
   id?: string;
   name: string;
@@ -14,4 +16,9 @@ export interface MinistryMember {
   personId: string;
   role?: string;
   status: MinistryStatus;
+  ministry?: Ministry;
+  person?: Partial<Person> & {
+    middlename?: string;
+    lastname?: string;
+  };
 }

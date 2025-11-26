@@ -1,12 +1,17 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useMinistry } from '../hooks/useMinistry';
 import { CreateMinistryMemberRequest, UpdateMinistryMemberRequest } from '../types/ministryTypes';
-import { MinistryMember, MinistryStatus } from '@/core/domain/ministry';
+import { MinistryMember, MinistryStatus, Ministry } from '@/core/domain/ministry';
+import { Person } from '@/core/domain/person';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
+import { Combobox, ComboboxOption } from '@/components/ui/Combobox';
+import { getPersons } from '@/features/persons/api/personApi';
+import { useAuthStore } from '@/features/auth/store/authStore';
+import useStore from '@/core/hooks/useStore';
 import { toast } from 'sonner';
 
 interface CreateMinistryMemberFormProps {
@@ -22,7 +27,8 @@ export const CreateMinistryMemberForm: React.FC<CreateMinistryMemberFormProps> =
   onSuccess,
   onCancel,
 }) => {
-  const { createMinistryMember, updateMinistryMember, loading, error } = useMinistry();
+  const { createMinistryMember, updateMinistryMember, getAllMinistries, getMinistryById, loading, error } = useMinistry();
+  const token = useStore(useAuthStore, (state) => state.token);
   const isEditMode = !!memberToEdit;
   
   const [formData, setFormData] = useState<CreateMinistryMemberRequest>({
@@ -90,6 +96,68 @@ export const CreateMinistryMemberForm: React.FC<CreateMinistryMemberFormProps> =
     }
   };
 
+  // Función para cargar todas las personas inicialmente
+  const loadAllPersons = useCallback(async (): Promise<ComboboxOption<Person>[]> => {
+    if (!token) {
+      return [];
+    }
+    
+    try {
+      const persons = await getPersons(token, null);
+      return persons.map((person) => {
+        const fullName = [
+          person.name?.trim(),
+          person.middleName?.trim(),
+          person.lastName?.trim(),
+        ]
+          .filter(Boolean)
+          .join(' ');
+        
+        return {
+          value: person.id,
+          label: fullName || `ID: ${person.id}`,
+          data: person,
+        };
+      });
+    } catch (err) {
+      console.error('Error loading persons:', err);
+      return [];
+    }
+  }, [token]);
+
+  // Función para filtrar personas (búsqueda en nombre completo y ID)
+  const filterPersons = useCallback((option: ComboboxOption<Person>, query: string): boolean => {
+    const lowerQuery = query.toLowerCase();
+    const matchesLabel = option.label.toLowerCase().includes(lowerQuery);
+    const matchesId = String(option.value).toLowerCase().includes(lowerQuery);
+    return matchesLabel || matchesId;
+  }, []);
+
+  // Función para cargar todos los ministerios inicialmente
+  const loadAllMinistries = useCallback(async (): Promise<ComboboxOption<Ministry>[]> => {
+    if (!token) {
+      return [];
+    }
+    
+    try {
+      const ministries = await getAllMinistries();
+      return ministries.map((ministry) => ({
+        value: String(ministry.id),
+        label: `${ministry.name} (ID: ${ministry.id})`,
+        data: ministry,
+      }));
+    } catch (err) {
+      console.error('Error loading ministries:', err);
+      return [];
+    }
+  }, [getAllMinistries, token]);
+
+  // Función para filtrar ministerios (búsqueda en nombre e ID)
+  const filterMinistries = useCallback((option: ComboboxOption<Ministry>, query: string): boolean => {
+    const lowerQuery = query.toLowerCase();
+    return option.label.toLowerCase().includes(lowerQuery);
+  }, []);
+
   const ministryStatusOptions = [
     { value: 'A', label: 'Activo' },
     { value: 'I', label: 'Inactivo' },
@@ -100,32 +168,28 @@ export const CreateMinistryMemberForm: React.FC<CreateMinistryMemberFormProps> =
       <div className="space-y-4">
         {/* Campo ministryId oculto si viene del contexto */}
         {!ministryId && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              ID del Ministerio *
-            </label>
-            <Input
-              type="text"
-              value={formData.ministryId}
-              onChange={(e) => handleInputChange('ministryId', e.target.value)}
-              placeholder="Ingrese el ID del ministerio"
-              required
-            />
-          </div>
+          <Combobox<Ministry>
+            label="Ministerio *"
+            placeholder="Buscar ministerio por nombre o ID..."
+            value={formData.ministryId}
+            onChange={(value) => handleInputChange('ministryId', String(value))}
+            loadInitialData={loadAllMinistries}
+            filterFn={filterMinistries}
+            required
+            minSearchLength={0}
+          />
         )}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            ID de la Persona *
-          </label>
-          <Input
-            type="text"
-            value={formData.personId}
-            onChange={(e) => handleInputChange('personId', e.target.value)}
-            placeholder="Ingrese el ID de la persona"
-            required
-          />
-        </div>
+        <Combobox<Person>
+          label="Persona *"
+          placeholder="Buscar persona por nombre o ID..."
+          value={formData.personId}
+          onChange={(value) => handleInputChange('personId', String(value))}
+          loadInitialData={loadAllPersons}
+          filterFn={filterPersons}
+          required
+          minSearchLength={0}
+        />
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

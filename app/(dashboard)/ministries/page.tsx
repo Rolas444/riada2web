@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useMinistry } from '@/features/ministry';
 import { Ministry, MinistryMember } from '@/core/domain/ministry';
 import { Button } from '@/components/ui/Button';
@@ -14,16 +14,15 @@ import { Row } from '@tanstack/react-table';
 
 export default function MinistriesPage() {
   const [ministries, setMinistries] = useState<Ministry[]>([]);
-  const [ministryMembers, setMinistryMembers] = useState<MinistryMember[]>([]);
+  const [selectedMinistryMembers, setSelectedMinistryMembers] = useState<MinistryMember[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
-  const [, setSelectedMinistry] = useState<Ministry | null>(null);
+  const [selectedMinistry, setSelectedMinistry] = useState<Ministry | null>(null);
   const [activeTab, setActiveTab] = useState<'ministries' | 'members'>('ministries');
   
   const { 
     getAllMinistries, 
-    getAllMinistryMembers, 
     getMinistryMembersByMinistry,
     loading, 
     error 
@@ -32,14 +31,9 @@ export default function MinistriesPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [ministriesData, membersData] = await Promise.all([
-          getAllMinistries(),
-          getAllMinistryMembers()
-        ]);
+        const ministriesData = await getAllMinistries();
         console.log('ministriesData:', ministriesData);
-        console.log('membersData:', membersData);
         setMinistries(ministriesData);
-        setMinistryMembers(membersData);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Error al cargar datos';
         toast.error(errorMessage);
@@ -47,7 +41,7 @@ export default function MinistriesPage() {
     };
 
     fetchData();
-  }, [getAllMinistries, getAllMinistryMembers]);
+  }, [getAllMinistries]);
 
   const filteredMinistries = useMemo(() => {
     if (!searchQuery) return ministries;
@@ -60,14 +54,14 @@ export default function MinistriesPage() {
   }, [searchQuery, ministries]);
 
   const filteredMembers = useMemo(() => {
-    if (!searchQuery) return ministryMembers;
+    if (!searchQuery) return selectedMinistryMembers;
     const lowercasedQuery = searchQuery.toLowerCase();
-    return ministryMembers.filter(member => 
+    return selectedMinistryMembers.filter(member => 
       Object.values(member).some(value => 
         String(value).toLowerCase().includes(lowercasedQuery)
       )
     );
-  }, [searchQuery, ministryMembers]);
+  }, [searchQuery, selectedMinistryMembers]);
 
   const handleSearch = () => {
   };
@@ -77,9 +71,20 @@ export default function MinistriesPage() {
     getAllMinistries().then(setMinistries).catch(console.error);
   };
 
+  const refreshSelectedMinistryMembers = useCallback(async () => {
+    if (!selectedMinistry?.id) return;
+    try {
+      const members = await getMinistryMembersByMinistry(String(selectedMinistry.id));
+      setSelectedMinistryMembers(members);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al actualizar miembros del ministerio';
+      toast.error(errorMessage);
+    }
+  }, [getMinistryMembersByMinistry, selectedMinistry]);
+
   const handleAddMemberSuccess = () => {
     setIsAddMemberModalOpen(false);
-    getAllMinistryMembers().then(setMinistryMembers).catch(console.error);
+    refreshSelectedMinistryMembers();
   };
 
   const handleViewMembers = async (ministry: Ministry) => {
@@ -87,10 +92,8 @@ export default function MinistriesPage() {
     setSelectedMinistry(ministry);
     setActiveTab('members');
     try {
-      const fetchedMembers = await getMinistryMembersByMinistry(ministry.id!);
-      // Filtrar solo los miembros de este ministerio específico
-      const filteredMembers = fetchedMembers.filter(member => member.ministryId === ministry.id);
-      setMinistryMembers(filteredMembers);
+      const fetchedMembers = await getMinistryMembersByMinistry(String(ministry.id));
+      setSelectedMinistryMembers(fetchedMembers);
     } catch {
       toast.error('Error al cargar miembros del ministerio');
     }
@@ -100,27 +103,35 @@ export default function MinistriesPage() {
     {
       header: 'ID',
       accessorKey: 'id',
+      size: 80,
+      cell: ({ row }: { row: Row<Ministry> }) => (
+        <span className="whitespace-nowrap">{row.original.id}</span>
+      ),
     },
     {
       header: 'Nombre',
       accessorKey: 'name',
+      size: 200,
+      cell: ({ row }: { row: Row<Ministry> }) => (
+        <span className="break-words">{row.original.name}</span>
+      ),
     },
-    
     {
       header: 'Descripción',
       accessorKey: 'description',
+      size: 300,
       cell: ({ row }: { row: Row<Ministry> }) => (
-        <span className="truncate max-w-xs">
+        <span className="break-words text-gray-700 dark:text-gray-300">
           {row.original.description || '-'}
         </span>
       ),
     },
-    
     {
       header: 'Misión',
-      accessorKey: 'Mission',
+      accessorKey: 'mission',
+      size: 300,
       cell: ({ row }: { row: Row<Ministry> }) => (
-        <span className="truncate max-w-xs">
+        <span className="break-words text-gray-700 dark:text-gray-300">
           {row.original.mission || '-'}
         </span>
       ),
@@ -128,8 +139,9 @@ export default function MinistriesPage() {
     {
       header: 'Estado',
       accessorKey: 'status',
+      size: 100,
       cell: ({ row }: { row: Row<Ministry> }) => (
-        <span className={row.original.status === 'A' ? 'text-green-600' : 'text-red-600'}>
+        <span className={`whitespace-nowrap ${row.original.status === 'A' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
           {row.original.status === 'A' ? 'Activo' : 'Inactivo'}
         </span>
       ),
@@ -137,10 +149,12 @@ export default function MinistriesPage() {
     {
       header: 'Acciones',
       accessorKey: 'actions',
+      size: 150,
       cell: ({ row }: { row: Row<Ministry> }) => (
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 whitespace-nowrap">
           <Button
             onClick={() => handleViewMembers(row.original)}
+            className="text-xs px-2 py-1"
           >
             Ver Miembros
           </Button>
@@ -155,12 +169,30 @@ export default function MinistriesPage() {
       accessorKey: 'id',
     },
     {
-      header: 'Ministerio ID',
-      accessorKey: 'ministryId',
+      header: 'Ministerio',
+      accessorKey: 'ministry.name',
     },
     {
-      header: 'Persona ID',
-      accessorKey: 'personId',
+      header: 'Persona',
+      accessorKey: 'person.name',
+      cell: ({ row }: { row: Row<MinistryMember> }) => {
+        const { person } = row.original as MinistryMember & {
+          person?: {
+            name?: string;
+            middleName?: string;
+            lastName?: string;
+          };
+        };
+        const fullName = [
+          person?.name?.trim(),
+          person?.middleName?.trim(),
+          person?.lastName?.trim(),
+        ]
+          .filter(Boolean)
+          .join(' ');
+
+        return <span>{fullName || '-'}</span>;
+      },
     },
     {
       header: 'Rol',
@@ -183,10 +215,10 @@ export default function MinistriesPage() {
   ];
 
   return (
-    <div>
-      {/* Header con título y botón - igual que people */}
-      <div className="flex items-center justify-between">
-        <div>
+    <div className="w-full max-w-full min-w-0">
+      {/* Header con título y botón - responsivo */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div className="flex-1 min-w-0">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Gestión de Ministerios
           </h1>
@@ -194,20 +226,26 @@ export default function MinistriesPage() {
             Administra los ministerios y sus miembros del sistema.
           </p>
         </div>
-        {activeTab === 'ministries' ? (
-          <Button onClick={() => setIsCreateModalOpen(true)}>Nuevo</Button>
-        ) : (
-          <Button onClick={() => setIsAddMemberModalOpen(true)}>Nuevo</Button>
-        )}
+        <div className="flex-shrink-0">
+          {activeTab === 'ministries' ? (
+            <Button onClick={() => setIsCreateModalOpen(true)} className="w-full sm:w-auto">
+              Nuevo
+            </Button>
+          ) : (
+            <Button onClick={() => setIsAddMemberModalOpen(true)} className="w-full sm:w-auto">
+              Nuevo
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Tabs */}
-      <div className="mt-6 mb-4">
+      <div className="mb-4">
         <div className="border-b border-gray-200 dark:border-gray-700">
-          <nav className="-mb-px flex space-x-8">
+          <nav className="-mb-px flex space-x-4 sm:space-x-8 overflow-x-auto">
             <button
               onClick={() => setActiveTab('ministries')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'ministries'
                   ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
@@ -217,7 +255,7 @@ export default function MinistriesPage() {
             </button>
             <button
               onClick={() => setActiveTab('members')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'members'
                   ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
@@ -229,8 +267,8 @@ export default function MinistriesPage() {
         </div>
       </div>
 
-      {/* Búsqueda - igual que people */}
-      <div className="flex items-center py-4 space-x-2">
+      {/* Búsqueda - responsivo */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 py-4">
         <Input
           placeholder={
             activeTab === 'ministries'
@@ -239,32 +277,51 @@ export default function MinistriesPage() {
           }
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="max-w-sm"
+          className="flex-1 min-w-0"
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleSearch();
           }}
         />
-        <Button onClick={handleSearch}>Buscar</Button>
+        <Button onClick={handleSearch} className="w-full sm:w-auto sm:flex-shrink-0">
+          Buscar
+        </Button>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-4 w-full min-w-0">
         {error && (
           <p className="text-center text-red-500 dark:text-red-400 mb-4">
             Error: {error}
           </p>
         )}
         {activeTab === 'ministries' ? (
-          <DataTable
-            data={filteredMinistries}
-            columns={ministryColumns}
-            loading={loading}
-          />
+          <div className="w-full min-w-0">
+            <DataTable
+              data={filteredMinistries}
+              columns={ministryColumns}
+              loading={loading}
+            />
+          </div>
         ) : (
-          <DataTable
-            data={filteredMembers}
-            columns={memberColumns}
-            loading={loading}
-          />
+          <>
+            {selectedMinistry ? (
+              <>
+                <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+                  Mostrando miembros del ministerio <span className="font-semibold">{selectedMinistry.name}</span>
+                </p>
+                <div className="w-full min-w-0">
+                  <DataTable
+                    data={filteredMembers}
+                    columns={memberColumns}
+                    loading={loading}
+                  />
+                </div>
+              </>
+            ) : (
+              <p className="text-center text-gray-500 dark:text-gray-400">
+                Selecciona un ministerio para ver sus miembros.
+              </p>
+            )}
+          </>
         )}
       </div>
 
