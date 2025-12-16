@@ -124,22 +124,24 @@ export const CreateMinistryForm: React.FC<CreateMinistryFormProps> = ({
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Estado *
-          </label>
-          <Select
-            value={formData.status}
-            onChange={(e) => handleInputChange('status', e.target.value as MinistryStatus)}
-            required
-          >
-            {ministryStatusOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </Select>
-        </div>
+        {isEditMode && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Estado *
+            </label>
+            <Select
+              value={formData.status}
+              onChange={(e) => handleInputChange('status', e.target.value as MinistryStatus)}
+              required
+            >
+              {ministryStatusOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Select>
+          </div>
+        )}
       </div>
 
       {error && (
