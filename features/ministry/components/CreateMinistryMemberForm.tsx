@@ -164,34 +164,39 @@ export const CreateMinistryMemberForm: React.FC<CreateMinistryMemberFormProps> =
   ];
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Contenedor responsive para los campos del formulario */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Campo ministryId oculto si viene del contexto */}
         {!ministryId && (
-          <Combobox<Ministry>
-            label="Ministerio *"
-            placeholder="Buscar ministerio por nombre o ID..."
-            value={formData.ministryId}
-            onChange={(value) => handleInputChange('ministryId', String(value))}
-            loadInitialData={loadAllMinistries}
-            filterFn={filterMinistries}
+          <div className="sm:col-span-2 min-w-0">
+            <Combobox<Ministry>
+              label="Ministerio *"
+              placeholder="Buscar ministerio por nombre o ID..."
+              value={formData.ministryId}
+              onChange={(value) => handleInputChange('ministryId', String(value))}
+              loadInitialData={loadAllMinistries}
+              filterFn={filterMinistries}
+              required
+              minSearchLength={0}
+            />
+          </div>
+        )}
+
+        <div className="sm:col-span-2 min-w-0">
+          <Combobox<Person>
+            label="Persona *"
+            placeholder="Buscar persona por nombre o ID..."
+            value={formData.personId}
+            onChange={(value) => handleInputChange('personId', String(value))}
+            loadInitialData={loadAllPersons}
+            filterFn={filterPersons}
             required
             minSearchLength={0}
           />
-        )}
+        </div>
 
-        <Combobox<Person>
-          label="Persona *"
-          placeholder="Buscar persona por nombre o ID..."
-          value={formData.personId}
-          onChange={(value) => handleInputChange('personId', String(value))}
-          loadInitialData={loadAllPersons}
-          filterFn={filterPersons}
-          required
-          minSearchLength={0}
-        />
-
-        <div>
+        <div className="min-w-0">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Rol
           </label>
@@ -203,11 +208,12 @@ export const CreateMinistryMemberForm: React.FC<CreateMinistryMemberFormProps> =
           />
         </div>
 
-        <div>
+        <div hidden={true} className="min-w-0">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Estado *
           </label>
           <Select
+            hidden={true}
             value={formData.status}
             onChange={(e) => handleInputChange('status', e.target.value as MinistryStatus)}
             required

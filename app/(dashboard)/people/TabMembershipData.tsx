@@ -87,8 +87,9 @@ export const TabMembershipData = ({ person, onMembershipUpdate }: TabMembershipD
                 </div>
             ) : (
                 <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
-                    <div className="flex flex-wrap gap-x-6 gap-y-4">
-                        <div className="flex-1 min-w-[150px]">
+                    {/* Contenedor principal responsive para datos de membresía */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="min-w-0">
                             <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">
                                 Estado
                             </label>
@@ -99,7 +100,7 @@ export const TabMembershipData = ({ person, onMembershipUpdate }: TabMembershipD
                             </p>
                         </div>
 
-                        <div className="flex-1 min-w-[150px]">
+                        <div className="min-w-0">
                             <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">
                                 Fecha de Alta
                             </label>
@@ -107,7 +108,8 @@ export const TabMembershipData = ({ person, onMembershipUpdate }: TabMembershipD
                                 {membership.startedAt ? new Date(membership.startedAt).toLocaleDateString() : 'No especificada'}
                             </p>
                         </div>
-                        <div className="flex-1 min-w-[150px]">
+
+                        <div className="min-w-0">
                             <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">
                                 Bautizado
                             </label>
@@ -115,8 +117,9 @@ export const TabMembershipData = ({ person, onMembershipUpdate }: TabMembershipD
                                 {membership.baptized ? 'Sí' : 'No'}
                             </p>
                         </div>
+
                         {membership.baptismDate && (
-                            <div className="flex-1 min-w-[150px]">
+                            <div className="min-w-0">
                                 <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">
                                     Fecha de Bautismo
                                 </label>
@@ -125,16 +128,18 @@ export const TabMembershipData = ({ person, onMembershipUpdate }: TabMembershipD
                                 </p>
                             </div>
                         )}
+
                         {membership.nameLastChurch && (
-                            <div className="flex-1 min-w-[150px]">
+                            <div className="sm:col-span-2 lg:col-span-3 min-w-0">
                                 <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">
                                     Última Iglesia
                                 </label>
-                                <p className="text-sm">{membership.nameLastChurch}</p>
+                                <p className="text-sm break-words">{membership.nameLastChurch}</p>
                             </div>
                         )}
                     </div>
 
+                    {/* Chips de estado con wrap adecuado */}
                     <div className="mt-4 flex flex-wrap gap-2">
                         <span className={`px-2 py-1 text-xs rounded-full ${
                             membership.membershipSigned

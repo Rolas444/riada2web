@@ -103,7 +103,6 @@ export default function MinistriesPage() {
     {
       header: 'ID',
       accessorKey: 'id',
-      size: 80,
       cell: ({ row }: { row: Row<Ministry> }) => (
         <span className="whitespace-nowrap">{row.original.id}</span>
       ),
@@ -111,7 +110,6 @@ export default function MinistriesPage() {
     {
       header: 'Nombre',
       accessorKey: 'name',
-      size: 200,
       cell: ({ row }: { row: Row<Ministry> }) => (
         <span className="break-words">{row.original.name}</span>
       ),
@@ -119,7 +117,6 @@ export default function MinistriesPage() {
     {
       header: 'Descripción',
       accessorKey: 'description',
-      size: 300,
       cell: ({ row }: { row: Row<Ministry> }) => (
         <span className="break-words text-gray-700 dark:text-gray-300">
           {row.original.description || '-'}
@@ -129,7 +126,6 @@ export default function MinistriesPage() {
     {
       header: 'Misión',
       accessorKey: 'mission',
-      size: 300,
       cell: ({ row }: { row: Row<Ministry> }) => (
         <span className="break-words text-gray-700 dark:text-gray-300">
           {row.original.mission || '-'}
@@ -139,7 +135,6 @@ export default function MinistriesPage() {
     {
       header: 'Estado',
       accessorKey: 'status',
-      size: 100,
       cell: ({ row }: { row: Row<Ministry> }) => (
         <span className={`whitespace-nowrap ${row.original.status === 'A' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
           {row.original.status === 'A' ? 'Activo' : 'Inactivo'}
@@ -149,7 +144,6 @@ export default function MinistriesPage() {
     {
       header: 'Acciones',
       accessorKey: 'actions',
-      size: 150,
       cell: ({ row }: { row: Row<Ministry> }) => (
         <div className="flex space-x-2 whitespace-nowrap">
           <Button
@@ -294,12 +288,14 @@ export default function MinistriesPage() {
           </p>
         )}
         {activeTab === 'ministries' ? (
-          <div className="w-full min-w-0">
-            <DataTable
-              data={filteredMinistries}
-              columns={ministryColumns}
-              loading={loading}
-            />
+          <div className="w-full min-w-0 overflow-x-auto">
+            <div className="inline-block min-w-full align-middle">
+              <DataTable
+                data={filteredMinistries}
+                columns={ministryColumns}
+                loading={loading}
+              />
+            </div>
           </div>
         ) : (
           <>
@@ -308,12 +304,14 @@ export default function MinistriesPage() {
                 <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
                   Mostrando miembros del ministerio <span className="font-semibold">{selectedMinistry.name}</span>
                 </p>
-                <div className="w-full min-w-0">
-                  <DataTable
-                    data={filteredMembers}
-                    columns={memberColumns}
-                    loading={loading}
-                  />
+                <div className="w-full min-w-0 overflow-x-auto">
+                  <div className="inline-block min-w-full align-middle">
+                    <DataTable
+                      data={filteredMembers}
+                      columns={memberColumns}
+                      loading={loading}
+                    />
+                  </div>
                 </div>
               </>
             ) : (
